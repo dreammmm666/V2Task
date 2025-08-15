@@ -13,6 +13,13 @@ app.use(cors());
 app.use(bodyParser.json());
 const cloudinary = require('./cloudinary');
 
+const STATIC_PATH = path.resolve(__dirname, "public");
+app.use(express.static(STATIC_PATH));
+
+// ----- SPA Fallback: ใช้ RegExp แทน "*" -----
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(STATIC_PATH, "index.html"));
+});
 
 // สมัครสมาชิก
 app.post('/api/register', async (req, res) => {
