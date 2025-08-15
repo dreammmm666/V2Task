@@ -1,79 +1,97 @@
-import React, { useEffect, useState } from 'react'
-import axios from 'axios'
-import '../Css/Table.css' 
-import Navbar from '../Component/Navbar_admin'
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import '../Css/Table.css';
+import Navbar from '../Component/Navbar_admin';
+
+// ===== Helper: บังคับให้ค่ากลายเป็น Array เสมอ =====
+const toArray = (val) => {
+  if (Array.isArray(val)) return val;
+  if (typeof val === 'string') {
+    try {
+      const x = JSON.parse(val);
+      return Array.isArray(x) ? x : (x && typeof x === 'object' ? Object.values(x) : []);
+    } catch {
+      return [];
+    }
+  }
+  if (val && typeof val === 'object') return Object.values(val);
+  return [];
+};
 
 function Admin() {
-  const [projects, setProjects] = useState([])
-  const [team, setTeam] = useState('admin')
-  const [selectedProjectId, setSelectedProjectId] = useState(null)
-  const [works, setWorks] = useState([])
-  const [showModal, setShowModal] = useState(false)
+  const [projects, setProjects] = useState([]);               // รายการโปรเจกต์ทั้งหมด (array)
+  const [team, setTeam] = useState('admin');
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const [works, setWorks] = useState([]);                     // งานย่อยของโปรเจกต์ที่เลือก (array)
 
-  const [showEmployeeModal, setShowEmployeeModal] = useState(false)
-  const [employeeData, setEmployeeData] = useState(null)
+  const [showModal, setShowModal] = useState(false);
 
-  // สำหรับ pagination
-  const [currentPage, setCurrentPage] = useState(1)
-  const rowsPerPage = 10 // กำหนดจำนวนแถวต่อหน้า
+  const [showEmployeeModal, setShowEmployeeModal] = useState(false);
+  const [employeeData, setEmployeeData] = useState(null);
+
+  // pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 10;
+
+  // ✅ ตั้งค่า baseURL แบบ relative (ทำงานได้ทั้ง dev/prod หาก server เสิร์ฟ /api อยู่โดเมนเดียวกัน)
+  // ถ้าคุณตั้ง axios baseURL ที่อื่นไว้แล้ว ตรงนี้ลบทิ้งได้
+  axios.defaults.baseURL = '';
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const res = await axios.get(`http://localhost:3001/api/projects/team/${team}`)
-        setProjects(res.data)
-        setCurrentPage(1) // รีเซ็ตไปหน้าแรกทุกครั้งที่ทีมเปลี่ยน
+        const res = await axios.get(`/api/projects/team/${team}`);
+        setProjects(toArray(res.data));     // ✅ normalize เป็น array เสมอ
+        setCurrentPage(1);
       } catch (error) {
-        console.error('เกิดข้อผิดพลาดในการโหลดโปรเจกต์:', error)
+        console.error('เกิดข้อผิดพลาดในการโหลดโปรเจกต์:', error);
+        setProjects([]);                    // ✅ กัน UI แตก
       }
-    }
+    };
+    fetchProjects();
+  }, [team]);
 
-    fetchProjects()
-  }, [team])
-
-  const handleTeamChange = (e) => {
-    setTeam(e.target.value)
-  }
+  const handleTeamChange = (e) => setTeam(e.target.value);
 
   const handleRowClick = async (projectId) => {
-    setSelectedProjectId(projectId)
+    setSelectedProjectId(projectId);
     try {
-      const res = await axios.get(`http://localhost:3001/api/works/project/${projectId}`)
-      setWorks(res.data)
-      setShowModal(true)
+      const res = await axios.get(`/api/works/project/${projectId}`);
+      setWorks(toArray(res.data));          // ✅ normalize
+      setShowModal(true);
     } catch (error) {
-      console.error('โหลด works ล้มเหลว:', error)
+      console.error('โหลด works ล้มเหลว:', error);
+      setWorks([]);                         // ✅ กัน UI แตก
+      setShowModal(true);
     }
-  }
+  };
 
   const handleEmployeeClick = async (username) => {
     try {
-      const res = await axios.get(`http://localhost:3001/api/employees/${username}`)
-      setEmployeeData(res.data)
-      setShowEmployeeModal(true)
+      const res = await axios.get(`/api/employees/${username}`);
+      // ปล่อยเป็น object ได้ (ไม่ต้อง map)
+      setEmployeeData(res.data || null);
+      setShowEmployeeModal(true);
     } catch (error) {
-      console.error('โหลดข้อมูลพนักงานล้มเหลว:', error)
-      setEmployeeData(null)
+      console.error('โหลดข้อมูลพนักงานล้มเหลว:', error);
+      setEmployeeData(null);
+      setShowEmployeeModal(true);
     }
-  }
+  };
 
-  // คำนวณขอบเขตของข้อมูลที่จะแสดงในแต่ละหน้า
-  const indexOfLast = currentPage * rowsPerPage
-  const indexOfFirst = indexOfLast - rowsPerPage
-  const currentProjects = projects.slice(indexOfFirst, indexOfLast)
+  // ===== Pagination (ปลอดภัยด้วย toArray) =====
+  const safeProjects = toArray(projects);
+  const totalPages = Math.max(1, Math.ceil(safeProjects.length / rowsPerPage));
+  const indexOfLast = currentPage * rowsPerPage;
+  const indexOfFirst = indexOfLast - rowsPerPage;
+  const currentProjects = safeProjects.slice(indexOfFirst, indexOfLast);
 
-  // ฟังก์ชันเปลี่ยนหน้า
   const nextPage = () => {
-    if (currentPage < Math.ceil(projects.length / rowsPerPage)) {
-      setCurrentPage(currentPage + 1)
-    }
-  }
-
+    if (currentPage < totalPages) setCurrentPage((p) => p + 1);
+  };
   const prevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1)
-    }
-  }
+    if (currentPage > 1) setCurrentPage((p) => p - 1);
+  };
 
   return (
     <>
@@ -82,8 +100,15 @@ function Admin() {
         <div className="card">
 
           <div style={{ marginBottom: '1rem' }}>
-            <label htmlFor="team-select" style={{ fontWeight: '600', marginRight: '10px' }}>เลือกทีม: </label>
-            <select id="team-select" value={team} onChange={handleTeamChange} className='select-custom'>
+            <label htmlFor="team-select" style={{ fontWeight: '600', marginRight: '10px' }}>
+              เลือกทีม:{' '}
+            </label>
+            <select
+              id="team-select"
+              value={team}
+              onChange={handleTeamChange}
+              className="select-custom"
+            >
               <option value="admin">Admin</option>
               <option value="graphics">Graphics</option>
               <option value="marketing">Marketing</option>
@@ -93,7 +118,8 @@ function Admin() {
           <p style={{ fontSize: '20px' }}>
             โปรเจกต์ที่รับผิดชอบโดยทีม: {team}
           </p>
-          {projects.length === 0 ? (
+
+          {safeProjects.length === 0 ? (
             <p>ยังไม่มีโปรเจกต์</p>
           ) : (
             <>
@@ -110,35 +136,42 @@ function Admin() {
                   </tr>
                 </thead>
                 <tbody>
-                  {currentProjects.map((project) => (
-                    <tr
-                      key={project.project_id}
-                      className={
-                        project.status === 'เสร็จสิ้น'
-                          ? 'row-complete'
-                          : project.status === 'กำลังดำเนินการ'
-                          ? 'row-in-progress'
-                          : 'row-default'
-                      }
-                      onClick={() => handleRowClick(project.project_id)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <td>{project.project_id}</td>
-                      <td>{project.project_name}</td>
-                      <td>{project.customer_name}</td>
-                      <td>{Number(project.price).toLocaleString()}</td>
-                      <td>{project.responsible_team}</td>
-                      <td>{project.status}</td>
-                      <td>{project.due_date ? new Date(project.due_date).toLocaleDateString('th-TH') : '-'}</td>
-                    </tr>
-                  ))}
+                  {toArray(currentProjects).map((project) => {
+                    const priceNum = Number(project?.price ?? 0);
+                    const dueDateText = project?.due_date
+                      ? new Date(project.due_date).toLocaleDateString('th-TH')
+                      : '-';
+                    const rowClass =
+                      project?.status === 'เสร็จสิ้น'
+                        ? 'row-complete'
+                        : project?.status === 'กำลังดำเนินการ'
+                        ? 'row-in-progress'
+                        : 'row-default';
+
+                    return (
+                      <tr
+                        key={project?.project_id ?? `${project?.project_name}-${project?.customer_name}`}
+                        className={rowClass}
+                        onClick={() => project?.project_id && handleRowClick(project.project_id)}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <td>{project?.project_id ?? '-'}</td>
+                        <td>{project?.project_name ?? '-'}</td>
+                        <td>{project?.customer_name ?? '-'}</td>
+                        <td>{isNaN(priceNum) ? '-' : priceNum.toLocaleString()}</td>
+                        <td>{project?.responsible_team ?? '-'}</td>
+                        <td>{project?.status ?? '-'}</td>
+                        <td>{dueDateText}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
 
               <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center', gap: '10px' }}>
-                <button onClick={prevPage} disabled={currentPage === 1} className='BBB'>ก่อนหน้า</button>
-                <span>หน้า {currentPage} / {Math.ceil(projects.length / rowsPerPage)}</span>
-                <button onClick={nextPage} disabled={currentPage === Math.ceil(projects.length / rowsPerPage)} className='BBB'>ถัดไป</button>
+                <button onClick={prevPage} disabled={currentPage === 1} className="BBB">ก่อนหน้า</button>
+                <span>หน้า {currentPage} / {totalPages}</span>
+                <button onClick={nextPage} disabled={currentPage === totalPages} className="BBB">ถัดไป</button>
               </div>
             </>
           )}
@@ -152,9 +185,9 @@ function Admin() {
                     <p style={{ fontSize: '20px' }}>x</p>
                   </button>
                 </div>
-                <h3>รายการงานย่อยของโปรเจกต์ {selectedProjectId}</h3>
+                <h3>รายการงานย่อยของโปรเจกต์ {selectedProjectId ?? '-'}</h3>
                 <br />
-                {works.length === 0 ? (
+                {toArray(works).length === 0 ? (
                   <p>ไม่พบงานย่อย</p>
                 ) : (
                   <table className="styled-table">
@@ -170,39 +203,43 @@ function Admin() {
                       </tr>
                     </thead>
                     <tbody>
-                      {works.map((work) => (
-                        <tr
-                          key={work.work_id}
-                          className={
-                            work.status === 'เสร็จสิ้น'
-                              ? 'row-complete'
-                              : work.status === 'กำลังดำเนินการ'
-                              ? 'row-in-progress'
-                              : work.status === 'รอดำเนินการ'
-                              ? 'row-pending'
-                              : work.status === 'ยกเลิก'
-                              ? 'row-cancelled'
-                              : ''
-                          }
-                        >
-                          <td>{work.work_id}</td>
-                          <td>{work.works_name}</td>
-                          <td>{work.work_type}</td>
-                          <td>{work.description}</td>
-                          <td
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleEmployeeClick(work.assigned_to)
-                            }}
-                            style={{ cursor: 'pointer', color: 'black', textDecoration: 'underline' }}
-                            title="คลิกดูข้อมูลพนักงาน"
-                          >
-                            {work.assigned_to}
-                          </td>
-                          <td>{new Date(work.due_date).toLocaleDateString('th-TH')}</td>
-                          <td>{work.status}</td>
-                        </tr>
-                      ))}
+                      {toArray(works).map((work) => {
+                        const workRowClass =
+                          work?.status === 'เสร็จสิ้น'
+                            ? 'row-complete'
+                            : work?.status === 'กำลังดำเนินการ'
+                            ? 'row-in-progress'
+                            : work?.status === 'รอดำเนินการ'
+                            ? 'row-pending'
+                            : work?.status === 'ยกเลิก'
+                            ? 'row-cancelled'
+                            : '';
+
+                        const workDue = work?.due_date
+                          ? new Date(work.due_date).toLocaleDateString('th-TH')
+                          : '-';
+
+                        return (
+                          <tr key={work?.work_id ?? `${work?.works_name}-${work?.assigned_to}`} className={workRowClass}>
+                            <td>{work?.work_id ?? '-'}</td>
+                            <td>{work?.works_name ?? '-'}</td>
+                            <td>{work?.work_type ?? '-'}</td>
+                            <td>{work?.description ?? '-'}</td>
+                            <td
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (work?.assigned_to) handleEmployeeClick(work.assigned_to);
+                              }}
+                              style={{ cursor: work?.assigned_to ? 'pointer' : 'default', color: 'black', textDecoration: work?.assigned_to ? 'underline' : 'none' }}
+                              title={work?.assigned_to ? 'คลิกดูข้อมูลพนักงาน' : ''}
+                            >
+                              {work?.assigned_to ?? '-'}
+                            </td>
+                            <td>{workDue}</td>
+                            <td>{work?.status ?? '-'}</td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 )}
@@ -211,7 +248,7 @@ function Admin() {
           )}
 
           {/* Modal ข้อมูลพนักงาน */}
-          {showEmployeeModal && employeeData && (
+          {showEmployeeModal && (
             <div className="modal-overlay">
               <div className="modal-content" style={{ maxWidth: '400px' }}>
                 <div style={{ display: 'flex' }}>
@@ -220,11 +257,15 @@ function Admin() {
                   </button>
                 </div>
                 <h3>ข้อมูลพนักงานที่ผูกไว้</h3>
-                <div style={{ marginTop: '10px' }}>
-                  <p><strong>ชื่อ:</strong> {employeeData.full_name}</p>
-                  <p><strong>แผนก:</strong> {employeeData.department}</p>
-                  <p><strong>ตำแหน่ง:</strong> {employeeData.position}</p>
-                </div>
+                {employeeData ? (
+                  <div style={{ marginTop: '10px' }}>
+                    <p><strong>ชื่อ:</strong> {employeeData?.full_name ?? '-'}</p>
+                    <p><strong>แผนก:</strong> {employeeData?.department ?? '-'}</p>
+                    <p><strong>ตำแหน่ง:</strong> {employeeData?.position ?? '-'}</p>
+                  </div>
+                ) : (
+                  <p style={{ marginTop: '10px' }}>ไม่พบข้อมูลพนักงาน</p>
+                )}
               </div>
             </div>
           )}
@@ -232,7 +273,7 @@ function Admin() {
         </div>
       </div>
     </>
-  )
+  );
 }
 
-export default Admin
+export default Admin;
