@@ -15,7 +15,7 @@ function EditData() {
 const handleSearch = async () => {
   try {
     setLoading(true);
-    const res = await axios.get(`http://localhost:3001/api/${openModal}/${searchId}`);
+    const res = await axios.get(`/api/${openModal}/${searchId}`);
 
     const data = res.data;
 

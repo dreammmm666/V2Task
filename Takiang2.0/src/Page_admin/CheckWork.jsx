@@ -29,7 +29,7 @@ function CheckWorkAdmin() {
   }, [works, statusFilter]);
 
   const fetchWorks = () => {
-    axios.get('http://localhost:3001/api/submitted-works')
+    axios.get('/api/submitted-works')
       .then(res => setWorks(res.data))
       .catch(err => console.error(err));
   };
@@ -42,7 +42,7 @@ function CheckWorkAdmin() {
 
   const handleSave = async () => {
     try {
-      await axios.put('http://localhost:3001/api/submitted-works/update', {
+      await axios.put('/api/submitted-works/update', {
         username: editingWork.username,
         project_id: editingWork.project_id,
         works_id: editingWork.works_id,

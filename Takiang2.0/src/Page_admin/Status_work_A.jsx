@@ -15,7 +15,7 @@ function SubmitWork() {
   useEffect(() => {
     if (!username) return;
 
-    axios.get(`http://localhost:3001/api/submitted-works/${username}`)
+    axios.get(`/api/submitted-works/${username}`)
       .then(res => {
         setSubmittedWorks(res.data);
         setCurrentPage(1); // รีเซ็ตหน้าเมื่อโหลดข้อมูลใหม่

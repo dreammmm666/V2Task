@@ -15,7 +15,7 @@ function MyWorkTable() {
     console.log('username from localStorage:', username);
     if (!username) return;
 
-    axios.get(`http://localhost:3001/api/works/user/${username}`)
+    axios.get(`/api/works/user/${username}`)
       .then(res => {
         setWorks(res.data);
         setCurrentPage(1); // reset page when data loads

@@ -21,7 +21,7 @@ function Add_user() {
 
   const fetchEmployees = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/api/employees');
+      const res = await axios.get('/api/employees');
       setEmployees(res.data);
     } catch (err) {
       console.error('โหลดรายชื่อพนักงานล้มเหลว:', err);
@@ -40,7 +40,7 @@ function Add_user() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:3001/api/register', formData);
+      await axios.post('/api/register', formData);
 
       Swal.fire({
         title: 'สำเร็จ!',
