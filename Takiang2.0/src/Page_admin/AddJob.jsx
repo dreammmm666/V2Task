@@ -61,7 +61,7 @@ function AddSubWork() {
 
   const fetchProjects = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/api/projects/inprogress');
+      const res = await axios.get('/api/projects/inprogress');
       setProjects(res.data);
     } catch (err) {
       console.error('โหลดโปรเจกต์ล้มเหลว:', err);
@@ -70,7 +70,7 @@ function AddSubWork() {
 
   const fetchTeams = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/api/teams');
+      const res = await axios.get('/api/teams');
       setTeams(res.data);
     } catch (err) {
       console.error('โหลดทีมล้มเหลว:', err);
@@ -79,7 +79,7 @@ function AddSubWork() {
 
   const fetchEmployeesByTeam = async (team) => {
     try {
-      const res = await axios.get(`http://localhost:3001/api/employees-by-team/${team}`);
+      const res = await axios.get(`/api/employees-by-team/${team}`);
       setEmployees(res.data);
     } catch (err) {
       console.error('โหลดข้อมูลพนักงานล้มเหลว:', err);
@@ -105,7 +105,7 @@ function AddSubWork() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:3001/api/works', formData);
+      await axios.post('/api/works', formData);
       Swal.fire({
         title: 'สำเร็จ!',
         text: 'เพิ่มงานย่อยเรียบร้อยแล้ว',
