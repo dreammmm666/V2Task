@@ -23,7 +23,7 @@ function AddProject() {
 
   const fetchCustomers = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/api/customers');
+      const res = await axios.get('/api/customers');
       setCustomers(res.data);
     } catch (err) {
       console.error('โหลดข้อมูลลูกค้าล้มเหลว:', err);
@@ -41,7 +41,7 @@ function AddProject() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:3001/api/projects', formData);
+      await axios.post('/api/projects', formData);
 
       Swal.fire({
         title: 'สำเร็จ!',
