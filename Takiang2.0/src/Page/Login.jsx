@@ -19,49 +19,49 @@ function Login() {
     })
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+const handleSubmit = async (e) => {
+  e.preventDefault()
 
-    if (!formData.username || !formData.password) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'กรุณากรอกข้อมูลให้ครบ',
-        confirmButtonText: 'ตกลง',
-      })
-      return
-    }
-
-    try {
-       const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/login`, formData)
-      const { message, team, user_id, username } = res.data  // <-- เพิ่ม username
-
-      // บันทึก team, user_id, username ลง localStorage
-      localStorage.setItem('team', team)
-      localStorage.setItem('user_id', user_id)
-      localStorage.setItem('username', username)
-
-      Swal.fire({
-        icon: 'success',
-        title: message || 'เข้าสู่ระบบสำเร็จ',
-        confirmButtonText: 'ตกลง',
-      }).then(() => {
-        if (team === 'graphics' || team === 'marketing') {
-          navigate('/index_user')
-        } else if (team === 'admin') {
-          navigate('/Admin')
-        } else {
-          navigate('/')
-        }
-      })
-    } catch (err) {
-      Swal.fire({
-        icon: 'error',
-        title: 'เข้าสู่ระบบไม่สำเร็จ',
-        text: err.response?.data?.message || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง',
-        confirmButtonText: 'ลองอีกครั้ง',
-      })
-    }
+  if (!formData.username || !formData.password) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'กรุณากรอกข้อมูลให้ครบ',
+      confirmButtonText: 'ตกลง',
+    })
+    return
   }
+
+  try {
+    // ✅ ใช้ URL จาก .env
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/login`, formData)
+    const { message, team, user_id, username } = res.data
+
+    localStorage.setItem('team', team)
+    localStorage.setItem('user_id', user_id)
+    localStorage.setItem('username', username)
+
+    Swal.fire({
+      icon: 'success',
+      title: message || 'เข้าสู่ระบบสำเร็จ',
+      confirmButtonText: 'ตกลง',
+    }).then(() => {
+      if (team === 'graphics' || team === 'marketing') {
+        navigate('/index_user')
+      } else if (team === 'admin') {
+        navigate('/Admin')
+      } else {
+        navigate('/')
+      }
+    })
+  } catch (err) {
+    Swal.fire({
+      icon: 'error',
+      title: 'เข้าสู่ระบบไม่สำเร็จ',
+      text: err.response?.data?.message || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง',
+      confirmButtonText: 'ลองอีกครั้ง',
+    })
+  }
+}
 
   return (
     <div>
