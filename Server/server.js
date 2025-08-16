@@ -16,7 +16,37 @@ const cloudinary = require('./cloudinary');
 const STATIC_PATH = path.resolve(__dirname, "public");
 app.use(express.static(STATIC_PATH));
 
+const allowedOrigins = [
+  'http://localhost:5173',        // Dev React
+  'http://127.0.0.1:5173',        // Dev React อีกแบบ
+  'https://v2taskk.onrender.com' // Prod React บน Render
+];
 
+// Middleware CORS
+app.use(cors({
+  origin: function (origin, callback) {
+    // อนุญาต request จาก Postman หรือ server ภายใน
+    if (!origin) return callback(null, true);
+
+    // ถ้าเป็น dev ให้อนุญาตทุก origin
+    if (process.env.NODE_ENV === 'development') {
+      return callback(null, true);
+    }
+
+    // ถ้าอยู่ใน allowedOrigins
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS: ' + origin));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// รองรับ preflight requests
+app.options('*', cors());
 
 // สมัครสมาชิก
 app.post('/api/register', async (req, res) => {
