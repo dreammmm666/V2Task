@@ -23,7 +23,7 @@ function AddCustomer() {
   }, []);
 
   const fetchCustomers = () => {
-    axios.get('http://localhost:3001/api/customers')
+    axios.get('/api/customers')
       .then(response => {
         setCustomers(response.data);
         setCurrentPage(1); // reset page when data loads
@@ -41,7 +41,7 @@ function AddCustomer() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:3001/api/customers', formData);
+      await axios.post('/api/customers', formData);
       fetchCustomers();
       setShowModal(false);
       setFormData({
