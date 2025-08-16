@@ -19,13 +19,12 @@ const toArray = (val) => {
 };
 
 function Admin() {
-  const [projects, setProjects] = useState([]);               // รายการโปรเจกต์ทั้งหมด (array)
+  const [projects, setProjects] = useState([]);               
   const [team, setTeam] = useState('admin');
   const [selectedProjectId, setSelectedProjectId] = useState(null);
-  const [works, setWorks] = useState([]);                     // งานย่อยของโปรเจกต์ที่เลือก (array)
+  const [works, setWorks] = useState([]);                     
 
   const [showModal, setShowModal] = useState(false);
-
   const [showEmployeeModal, setShowEmployeeModal] = useState(false);
   const [employeeData, setEmployeeData] = useState(null);
 
@@ -33,21 +32,20 @@ function Admin() {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
 
-  // ✅ ตั้งค่า baseURL แบบ relative (ทำงานได้ทั้ง dev/prod หาก server เสิร์ฟ /api อยู่โดเมนเดียวกัน)
-  // ถ้าคุณตั้ง axios baseURL ที่อื่นไว้แล้ว ตรงนี้ลบทิ้งได้
-  axios.defaults.baseURL = '';
+  // ===== ใช้ relative path เพื่อให้ proxy ของ Vite ส่งไป Node server =====
+  const fetchProjects = async () => {
+    try {
+      const res = await axios.get(`/api/projects/team/${team}`);
+      console.log('Projects fetched:', res.data);  // debug
+      setProjects(toArray(res.data));              
+      setCurrentPage(1);
+    } catch (error) {
+      console.error('เกิดข้อผิดพลาดในการโหลดโปรเจกต์:', error);
+      setProjects([]);                            
+    }
+  };
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const res = await axios.get(`/api/projects/team/${team}`);
-        setProjects(toArray(res.data));     // ✅ normalize เป็น array เสมอ
-        setCurrentPage(1);
-      } catch (error) {
-        console.error('เกิดข้อผิดพลาดในการโหลดโปรเจกต์:', error);
-        setProjects([]);                    // ✅ กัน UI แตก
-      }
-    };
     fetchProjects();
   }, [team]);
 
@@ -57,11 +55,11 @@ function Admin() {
     setSelectedProjectId(projectId);
     try {
       const res = await axios.get(`/api/works/project/${projectId}`);
-      setWorks(toArray(res.data));          // ✅ normalize
+      setWorks(toArray(res.data));                 
       setShowModal(true);
     } catch (error) {
       console.error('โหลด works ล้มเหลว:', error);
-      setWorks([]);                         // ✅ กัน UI แตก
+      setWorks([]);                                
       setShowModal(true);
     }
   };
@@ -69,7 +67,6 @@ function Admin() {
   const handleEmployeeClick = async (username) => {
     try {
       const res = await axios.get(`/api/employees/${username}`);
-      // ปล่อยเป็น object ได้ (ไม่ต้อง map)
       setEmployeeData(res.data || null);
       setShowEmployeeModal(true);
     } catch (error) {
@@ -86,12 +83,8 @@ function Admin() {
   const indexOfFirst = indexOfLast - rowsPerPage;
   const currentProjects = safeProjects.slice(indexOfFirst, indexOfLast);
 
-  const nextPage = () => {
-    if (currentPage < totalPages) setCurrentPage((p) => p + 1);
-  };
-  const prevPage = () => {
-    if (currentPage > 1) setCurrentPage((p) => p - 1);
-  };
+  const nextPage = () => { if (currentPage < totalPages) setCurrentPage((p) => p + 1); };
+  const prevPage = () => { if (currentPage > 1) setCurrentPage((p) => p - 1); };
 
   return (
     <>
@@ -115,11 +108,9 @@ function Admin() {
             </select>
           </div>
 
-          <p style={{ fontSize: '20px' }}>
-            โปรเจกต์ที่รับผิดชอบโดยทีม: {team}
-          </p>
+          <p style={{ fontSize: '20px' }}>โปรเจกต์ที่รับผิดชอบโดยทีม: {team}</p>
 
-          {safeProjects.length === 0 ? (
+          {currentProjects.length === 0 ? (
             <p>ยังไม่มีโปรเจกต์</p>
           ) : (
             <>
@@ -136,7 +127,7 @@ function Admin() {
                   </tr>
                 </thead>
                 <tbody>
-                  {toArray(currentProjects).map((project) => {
+                  {currentProjects.map((project) => {
                     const priceNum = Number(project?.price ?? 0);
                     const dueDateText = project?.due_date
                       ? new Date(project.due_date).toLocaleDateString('th-TH')
@@ -176,7 +167,7 @@ function Admin() {
             </>
           )}
 
-          {/* Modal แสดงงานย่อย */}
+          {/* Modal งานย่อย */}
           {showModal && (
             <div className="modal-overlay">
               <div className="modal-content">

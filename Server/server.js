@@ -16,10 +16,7 @@ const cloudinary = require('./cloudinary');
 const STATIC_PATH = path.resolve(__dirname, "public");
 app.use(express.static(STATIC_PATH));
 
-// ----- SPA Fallback: ใช้ RegExp แทน "*" -----
-app.get(/.*/, (req, res) => {
-  res.sendFile(path.join(STATIC_PATH, "index.html"));
-});
+
 
 // สมัครสมาชิก
 app.post('/api/register', async (req, res) => {
@@ -117,48 +114,27 @@ app.get('/api/projects/team/:team', async (req, res) => {
   const { team } = req.params;
   try {
     const [rows] = await db.query(
-      `SELECT 
-        p.*, 
-        c.customer_name 
-      FROM projects p 
-      JOIN customers c ON p.customer_id = c.customer_id 
-      WHERE p.responsible_team = ?`,
-      [team]
+      `SELECT p.*, c.customer_name 
+       FROM projects p 
+       JOIN customers c ON p.customer_id = c.customer_id 
+       WHERE LOWER(TRIM(p.responsible_team)) = ?`,
+      [team.toLowerCase().trim()]
     );
     res.json(rows);
   } catch (err) {
-    console.error('เกิดข้อผิดพลาด:', err);
-    res.status(500).send('Internal Server Error');
+    console.error(err);
+    res.status(500).json({ message: 'เกิดข้อผิดพลาด' });
   }
 });
 
-
-// server.js หรือ route ที่ใช้
 app.get('/api/works/project/:project_id', async (req, res) => {
-  const { project_id } = req.params
+  const { project_id } = req.params;
   try {
-    const [rows] = await db.query(
-      'SELECT * FROM works WHERE project_id = ?',
-      [project_id]
-    )
-    res.json(rows)
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ message: 'ดึงข้อมูลล้มเหลว' })
-  }
-})
-
-
-app.get('/api/employees/summary', async (req, res) => {
-  try {
-    const [rows] = await db.execute(`
-      SELECT employee_id, full_name, department, position
-      FROM employee
-    `);
+    const [rows] = await db.query('SELECT * FROM works WHERE project_id = ?', [project_id]);
     res.json(rows);
-  } catch (error) {
-    console.error('Error fetching employee summary:', error);
-    res.status(500).json({ error: 'Database error' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'เกิดข้อผิดพลาด' });
   }
 });
 
@@ -834,7 +810,10 @@ app.put('/api/works/:id', async (req, res) => {
 });
 
 
-
+// ----- SPA Fallback: ใช้ RegExp แทน "*" -----
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(STATIC_PATH, "index.html"));
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
