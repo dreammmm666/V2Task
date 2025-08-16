@@ -17,18 +17,23 @@ const STATIC_PATH = path.resolve(__dirname, "public");
 app.use(express.static(STATIC_PATH));
 
 const allowedOrigins = process.env.NODE_ENV === 'production'
-  ? ['https://your-frontend-domain.com'] // production
-  : ['http://localhost:5173'];           // local dev
+  ? [
+      'https://v2taskk.onrender.com', // domain จริงของ frontend
+      'https://www.v2taskk.onrender.com' // เพิ่มถ้ามี www
+    ]
+  : ['http://localhost:5173'];        // local dev
 
 app.use(cors({
   origin: function (origin, callback) {
+    // ถ้า origin ไม่มี (เช่น Postman หรือ same-origin) ให้อนุญาต
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.warn('Blocked by CORS:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true,
+  credentials: true, // อนุญาต cookie
 }));
 
 // สมัครสมาชิก
