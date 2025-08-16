@@ -9,7 +9,7 @@ function Profile() {
 
   useEffect(() => {
     if (!username) return;
-    axios.get(`http://localhost:3001/api/profile/${username}`)
+    axios.get(`/api/profile/${username}`)
       .then(res => setProfile(res.data))
       .catch(err => console.error('Error fetching profile:', err));
   }, [username]);

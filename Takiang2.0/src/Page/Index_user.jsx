@@ -27,7 +27,7 @@ function Index_user() {
       if (!savedTeam) return
 
       try {
-        const res = await axios.get(`http://localhost:3001/api/projects/team/${savedTeam}`)
+        const res = await axios.get(`/api/projects/team/${savedTeam}`)
         setProjects(res.data)
         setCurrentPage(1)  // reset page เวลาโหลดข้อมูลใหม่
       } catch (error) {
@@ -41,7 +41,7 @@ function Index_user() {
   const handleRowClick = async (projectId) => {
     setSelectedProjectId(projectId)
     try {
-      const res = await axios.get(`http://localhost:3001/api/works/project/${projectId}`)
+      const res = await axios.get(`/api/works/project/${projectId}`)
       setWorks(res.data)
       setShowModal(true)
     } catch (error) {
@@ -51,7 +51,7 @@ function Index_user() {
 
   const handleEmployeeClick = async (username) => {
     try {
-      const res = await axios.get(`http://localhost:3001/api/employees/${username}`)
+      const res = await axios.get(`/api/employees/${username}`)
       setEmployeeData(res.data)
       setShowEmployeeModal(true)
     } catch (error) {

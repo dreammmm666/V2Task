@@ -12,7 +12,7 @@ function MyWorkTable() {
     const username = localStorage.getItem('username');
     if (!username) return;
 
-    axios.get(`http://localhost:3001/api/works/user/${username}`)
+    axios.get(`/api/works/user/${username}`)
       .then(res => setWorks(res.data))
       .catch(err => console.error('Error fetching works:', err));
   }, []);

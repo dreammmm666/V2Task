@@ -15,13 +15,13 @@ function SubmitWork() {
   useEffect(() => {
     if (!username) return;
 
-    axios.get(`http://localhost:3001/api/works/inprogress/${username}`)
+    axios.get(`/api/works/inprogress/${username}`)
       .then(async (res) => {
         const worksWithRound = await Promise.all(
           res.data.map(async (work) => {
             try {
               const roundRes = await axios.get(
-                `http://localhost:3001/api/submit-work/latest-round/${username}/${work.project_id}/${work.works_id}`
+                `/api/submit-work/latest-round/${username}/${work.project_id}/${work.works_id}`
               );
               return { ...work, latestRound: roundRes.data.latestRound || 0 };
             } catch {
@@ -67,7 +67,7 @@ function SubmitWork() {
     }
 
     try {
-      await axios.post('http://localhost:3001/api/submit-work', {
+      await axios.post('/api/submit-work', {
         username: username,
         project_id: selectedWork.project_id,
         works_id: selectedWork.works_id,
@@ -88,7 +88,7 @@ function SubmitWork() {
           if (work.works_id === selectedWork.works_id) {
             try {
               const roundRes = await axios.get(
-                `http://localhost:3001/api/submit-work/latest-round/${username}/${work.project_id}/${work.works_id}`
+                `/api/submit-work/latest-round/${username}/${work.project_id}/${work.works_id}`
               );
               return { ...work, latestRound: roundRes.data.latestRound || roundNumber };
             } catch {
