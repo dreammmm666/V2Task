@@ -16,7 +16,21 @@ const cloudinary = require('./cloudinary');
 const STATIC_PATH = path.resolve(__dirname, "public");
 app.use(express.static(STATIC_PATH));
 
+const allowedOrigins = [
+  'http://localhost:5173', // dev React
+  'https://v2taskk.onrender.com/' // frontend deploy จริง
+];
 
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 
 // สมัครสมาชิก
 app.post('/api/register', async (req, res) => {
