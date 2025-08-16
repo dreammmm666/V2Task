@@ -16,10 +16,9 @@ const cloudinary = require('./cloudinary');
 const STATIC_PATH = path.resolve(__dirname, "public");
 app.use(express.static(STATIC_PATH));
 
-const allowedOrigins = [
-  'http://localhost:5173', // dev React
-  'https://v2taskk.onrender.com/' // frontend deploy จริง
-];
+const allowedOrigins = process.env.NODE_ENV === 'production'
+  ? ['https://your-frontend-domain.com'] // production
+  : ['http://localhost:5173'];           // local dev
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -29,7 +28,7 @@ app.use(cors({
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true
+  credentials: true,
 }));
 
 // สมัครสมาชิก
