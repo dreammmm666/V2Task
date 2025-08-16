@@ -39,11 +39,11 @@ const handleSearch = async () => {
 const handleSave = async () => {
   try {
     if (openModal && searchId) {
-      console.log('PUT to:', `http://localhost:3001/api/${openModal}/${searchId}`, formData);
-      await axios.put(`http://localhost:3001/api/${openModal}/${searchId}`, formData);
+      console.log('PUT to:', `/api/${openModal}/${searchId}`, formData);
+      await axios.put(`/api/${openModal}/${searchId}`, formData);
     } else if (openModal) {
-      console.log('POST to:', `http://localhost:3001/api/${openModal}`, formData);
-      await axios.post(`http://localhost:3001/api/${openModal}`, formData);
+      console.log('POST to:', `/api/${openModal}`, formData);
+      await axios.post(`/api/${openModal}`, formData);
     }
 
     Swal.fire({
