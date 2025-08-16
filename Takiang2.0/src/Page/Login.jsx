@@ -10,8 +10,10 @@ function Login() {
     password: '',
   })
 
-  const navigate = useNavigate()
+  const navigate = useNavigate()  
 
+    console.log('VITE_API_URL:', import.meta.env.VITE_API_URL);
+    
   const handleChange = (e) => {
     setFormData({
       ...formData,
