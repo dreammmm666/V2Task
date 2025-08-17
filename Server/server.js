@@ -349,19 +349,26 @@ app.get('/api/customers', async (req, res) => {
 });
 
 app.post('/api/customers', async (req, res) => {
-  const { customer_name, gender, phone, other_contact } = req.body;
+  const { customer_name, gender, phone, other_contact, tax_id, billing_address, email } = req.body;
   try {
     const [result] = await db.query(
-      `INSERT INTO customers (customer_name, gender, phone, other_contact)
-       VALUES (?, ?, ?, ?)`,
-      [customer_name, gender, phone, other_contact]
+      `INSERT INTO customers 
+       (customer_name, gender, phone, other_contact, tax_id, billing_address, email)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [customer_name, gender, phone, other_contact, tax_id, billing_address, email]
     );
-    res.status(201).json({ message: 'เพิ่มลูกค้าสำเร็จ', customer_id: result.insertId });
+
+    res.status(201).json({ 
+      message: 'เพิ่มลูกค้าสำเร็จ', 
+      customer_id: result.insertId 
+    });
+
   } catch (err) {
     console.error('เพิ่มลูกค้าไม่สำเร็จ:', err);
     res.status(500).json({ error: 'เพิ่มลูกค้าไม่สำเร็จ' });
   }
 });
+
 
 
 app.get('/api/employees', async (req, res) => {
