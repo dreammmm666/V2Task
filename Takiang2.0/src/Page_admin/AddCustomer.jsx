@@ -11,7 +11,10 @@ function AddCustomer() {
     customer_name: '',
     gender: '',
     phone: '',
-    other_contact: ''
+    other_contact: '',
+    tax_id: '',
+    billing_address: '',
+    email: ''
   });
 
   // pagination state
@@ -48,7 +51,10 @@ function AddCustomer() {
         customer_name: '',
         gender: '',
         phone: '',
-        other_contact: ''
+        other_contact: '',
+        tax_id: '',
+        billing_address: '',
+        email: ''
       });
 
       Swal.fire({
@@ -103,6 +109,9 @@ function AddCustomer() {
                   <th>เพศ</th>
                   <th>เบอร์โทร</th>
                   <th>ช่องทางติดต่ออื่นๆ</th>
+                  <th>เลขประจำตัวผู้เสียภาษี</th>
+                  <th>ที่อยู่ออกใบกำกับภาษี</th>
+                  <th>อีเมล</th>
                 </tr>
               </thead>
               <tbody>
@@ -114,11 +123,14 @@ function AddCustomer() {
                       <td>{customer.gender}</td>
                       <td>{customer.phone}</td>
                       <td>{customer.other_contact}</td>
+                      <td>{customer.tax_id}</td>
+                      <td>{customer.billing_address}</td>
+                      <td>{customer.email}</td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5" style={{ textAlign: 'center' }}>ไม่มีข้อมูลลูกค้า</td>
+                    <td colSpan="8" style={{ textAlign: 'center' }}>ไม่มีข้อมูลลูกค้า</td>
                   </tr>
                 )}
               </tbody>
@@ -179,6 +191,32 @@ function AddCustomer() {
                 autoComplete="off"
                 placeholder="ช่องทางติดต่ออื่นๆ"
                 value={formData.other_contact}
+                onChange={handleInputChange}
+              />
+              <label>เลขประจำตัวผู้เสียภาษี</label>
+              <input
+                type="text"
+                name="tax_id"
+                autoComplete="off"
+                placeholder="เลขประจำตัวผู้เสียภาษี"
+                value={formData.tax_id}
+                onChange={handleInputChange}
+              />
+              <label>ที่อยู่ออกใบกำกับภาษี</label>
+              <textarea
+                name="billing_address"
+                autoComplete="off"
+                placeholder="ที่อยู่ออกใบกำกับภาษี"
+                value={formData.billing_address}
+                onChange={handleInputChange}
+              />
+              <label>อีเมล</label>
+              <input
+                type="email"
+                name="email"
+                autoComplete="off"
+                placeholder="อีเมล"
+                value={formData.email}
                 onChange={handleInputChange}
               />
               <div className="modal-actions">
