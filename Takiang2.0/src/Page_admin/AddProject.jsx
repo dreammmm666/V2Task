@@ -45,7 +45,7 @@ function AddProject() {
 
       Swal.fire({
         title: 'สำเร็จ!',
-        text: 'เพิ่มโปรเจคเรียบร้อยแล้ว',
+        text: 'เพิ่มโปรเจกต์เรียบร้อยแล้ว',
         icon: 'success',
         confirmButtonText: 'ตกลง'
       });
@@ -59,7 +59,7 @@ function AddProject() {
         due_date: ''
       });
     } catch (err) {
-      console.error('เพิ่มโปรเจคล้มเหลว:', err);
+      console.error('เพิ่มโปรเจกต์ล้มเหลว:', err);
 
       let errorMessage = 'เกิดข้อผิดพลาด';
       if (err.response && err.response.data && err.response.data.message) {
@@ -82,12 +82,12 @@ function AddProject() {
         <div className="card form-card">
           <div className="form-header">
             <i data-feather="folder-plus"></i>
-            <h2>เพิ่มโปรเจค</h2>
+            <h2>เพิ่มโปรเจกต์</h2>
           </div>
 
           <form onSubmit={handleSubmit} className="user-form">
             <div className="form-group">
-              <label>ชื่อโปรเจค</label>
+              <label>ชื่อโปรเจกต์</label>
               <input
                 type="text"
                 name="project_name"
