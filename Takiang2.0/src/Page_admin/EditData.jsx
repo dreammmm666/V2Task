@@ -4,7 +4,7 @@ import axios from 'axios';
 import '../Css/Table.css';
 import Navbar from '../Component/Navbar_admin';
 import Swal from 'sweetalert2';
-
+import Select from 'react-select';
 
 function EditData() {
   const [openModal, setOpenModal] = useState(null);
@@ -35,6 +35,36 @@ const handleSearch = async () => {
     setLoading(false);
   }
 };
+const workTypeOptions = [
+    { value: "แผ่นอะคริลิกตัดตรงหรือเลเซอร์", label: "แผ่นอะคริลิกตัดตรงหรือเลเซอร์" },
+    { value: "ฟิล์มโปร่งแสง ", label: "ฟิล์มโปร่งแสง " },
+    { value: "แผ่นพับประชาสัมพันธ์", label: "แผ่นพับประชาสัมพันธ์" },
+    { value: "งานตัดพลาสวูด", label: "งานตัดพลาสวูด" },
+    { value: "งานตัดอะคริลิก", label: "งานตัดอะคริลิก" },
+    { value: "สติ๊กเกอร์ไดคัททั่วไป / ฉลากสินค้า / ตัวอักษร", label: "สติ๊กเกอร์ไดคัททั่วไป / ฉลากสินค้า / ตัวอักษร" },
+    { value: "แผ่นแจกโฆษณา 1 หน้า / ใบปลิว 1 หรือ 2 หน้า", label: "แผ่นแจกโฆษณา 1 หน้า / ใบปลิว 1 หรือ 2 หน้า" },
+    { value: "การ์ดเชิญงานแต่ง, งานบวช ฯลฯ", label: "การ์ดเชิญงานแต่ง, งานบวช ฯลฯ" },
+    { value: "ไฟล์โลโก้ที่ใช้ในงานพิมพ์หรือออกแบบ", label: "ไฟล์โลโก้ที่ใช้ในงานพิมพ์หรือออกแบบ" },
+    { value: "ยิงเลเซอร์แกะลายบนสแตนเลส", label: "ยิงเลเซอร์แกะลายบนสแตนเลส" },
+    { value: "ตู้ไฟติดฟิล์มหรือสติ๊กเกอร์โปร่งแสง", label: "ตู้ไฟติดฟิล์มหรือสติ๊กเกอร์โปร่งแสง" },
+    { value: "พิมพ์นามบัตร 1 หน้า / 2 หน้า", label: "พิมพ์นามบัตร 1 หน้า / 2 หน้า" },
+    { value: "กระดาษพีพีกันน้ำ", label: "กระดาษพีพีกันน้ำ" },
+    { value: "แผ่นพลาสวูดหนา", label: "แผ่นพลาสวูดหนา" },
+    { value: "ตรายางหมึกในตัว หรือหมึกแยก", label: "ตรายางหมึกในตัว หรือหมึกแยก" },
+    { value: "ป้ายสแตนเลสกัดกรด", label: "ป้ายสแตนเลสกัดกรด" },
+    { value: "งานพิมพ์ลงบนวัสดุ PVC มีด้านเงา/ด้าน", label: "งานพิมพ์ลงบนวัสดุ PVC มีด้านเงา/ด้าน" },
+    { value: "สติ๊กเกอร์ติดแผ่นอะคริลิก", label: "สติ๊กเกอร์ติดแผ่นอะคริลิก" },
+    { value: "สติ๊กเกอร์ฝ้า ", label: "สติ๊กเกอร์ฝ้า " },
+    { value: "สติ๊กเกอร์ซีทรู", label: "สติ๊กเกอร์ซีทรู" },
+    { value: "ปริ้นสติ๊กเกอร์ติดโฟมบอร์ด", label: "ปริ้นสติ๊กเกอร์ติดโฟมบอร์ด" },
+    { value: "สติ๊กเกอร์ติดแผ่น PP Board / ฟิวเจอร์บอร์ด", label: "สติ๊กเกอร์ติดแผ่น PP Board / ฟิวเจอร์บอร์ด" },
+    { value: "สติ๊กเกอร์ติดแผ่นพลาสวูด", label: "สติ๊กเกอร์ติดแผ่นพลาสวูด" },
+    { value: "สติ๊กเกอร์ติดสินค้า เช่น ขวดน้ำ, กล่องขนม", label: "สติ๊กเกอร์ติดสินค้า เช่น ขวดน้ำ, กล่องขนม" },
+    { value: "ธงราวพิมพ์ผ้า/ไวนิล แขวนตกแต่ง", label: "ธงราวพิมพ์ผ้า/ไวนิล แขวนตกแต่ง" },
+    { value: "ป้ายสามเหลี่ยมตั้งพื้น พลาสวูด", label: "ป้ายสามเหลี่ยมตั้งพื้น พลาสวูด" },
+    { value: "การพิมพ์ระบบแห้งด้วยรังสียูวี", label: "การพิมพ์ระบบแห้งด้วยรังสียูวี" },
+    { value: "วัสดุพีวีซีสำหรับพิมพ์งานขนาดใหญ่", label: "วัสดุพีวีซีสำหรับพิมพ์งานขนาดใหญ่" },
+  ];
 
 const handleSave = async () => {
   try {
@@ -114,6 +144,27 @@ const handleSave = async () => {
                   value={formData.customer_name || ''}
                   onChange={(e) => setFormData({ ...formData, customer_name: e.target.value })}
                 />
+              <label>เลขประจำตัวผู้เสียภาษี</label>
+                <input
+                  type="text"
+                  placeholder="เลขประจำตัวผู้เสียภาษี"
+                  value={formData.tax_id || ''}
+                  onChange={(e) => setFormData({ ...formData, tax_id: e.target.value })}
+                />
+              <label>ที่อยู่ออกใบกำกับภาษี</label>
+                <input
+                  type="text"
+                  placeholder="ที่อยู่ออกใบกำกับภาษี"
+                  value={formData.billing_address || ''}
+                  onChange={(e) => setFormData({ ...formData, billing_address: e.target.value })}
+                />
+              <label>อีเมล</label>
+                <input
+                  type="text"
+                  placeholder="อีเมล"
+                  value={formData.email || ''}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                />
                 <label>เพศ</label>
                 <select
                   value={formData.gender || ''}
@@ -152,7 +203,7 @@ const handleSave = async () => {
                 />
                 <label>ราคา</label>
                 <input
-                  type="number"
+                  type="text"
                   placeholder="ราคา"
                   value={formData.price || ''}
                   onChange={(e) => setFormData({ ...formData, price: e.target.value })}
@@ -190,13 +241,28 @@ const handleSave = async () => {
                   value={formData.works_name || ''}
                   onChange={(e) => setFormData({ ...formData, works_name: e.target.value })}
                 />
-                <label>ประเภทงาน</label>
-                <input
+               <div className="form-group">
+      <label>ประเภทงาน</label>
+      <Select
+        options={workTypeOptions}
+        value={workTypeOptions.find(opt => opt.value === formData.work_type) || null}
+        onChange={(selected) =>
+          setFormData(prev => ({ ...prev, work_type: selected?.value || '' }))
+        }
+        placeholder="-- เลือกประเภทงาน --"
+        isSearchable
+        maxMenuHeight={150}
+      />
+    </div>
+
+               <label>ราคา</label>
+              <input
                   type="text"
-                  placeholder="ประเภทงาน"
-                  value={formData.work_type || ''}
-                  onChange={(e) => setFormData({ ...formData, work_type: e.target.value })}
+                  placeholder="ราคา"
+                  value={formData.price || ''}
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                 />
+
                 <label>รายละเอียด</label>
                 <textarea
                   placeholder="รายละเอียด"

@@ -51,7 +51,7 @@ function Login() {
         confirmButtonText: 'ตกลง',
       }).then(() => {
         if (team === 'graphics' || team === 'marketing') {
-          navigate('/index_user')
+          navigate('/Mywork_user')
         } else if (team === 'admin') {
           navigate('/Admin')
         } else {

@@ -13,10 +13,10 @@ function AddSubWork() {
 
   const workTypeOptions = [
     { value: "แผ่นอะคริลิกตัดตรงหรือเลเซอร์", label: "แผ่นอะคริลิกตัดตรงหรือเลเซอร์" },
-    { value: "ฟิล์มโปร่งแสง ใช้กับป้ายไฟ", label: "ฟิล์มโปร่งแสง ใช้กับป้ายไฟ" },
+    { value: "ฟิล์มโปร่งแสง ", label: "ฟิล์มโปร่งแสง " },
     { value: "แผ่นพับประชาสัมพันธ์", label: "แผ่นพับประชาสัมพันธ์" },
-    { value: "งานตัดพลาสวูดด้วยเครื่อง CNC", label: "งานตัดพลาสวูดด้วยเครื่อง CNC" },
-    { value: "งานตัดอะคริลิกด้วยเครื่อง CNC", label: "งานตัดอะคริลิกด้วยเครื่อง CNC" },
+    { value: "งานตัดพลาสวูด", label: "งานตัดพลาสวูด" },
+    { value: "งานตัดอะคริลิก", label: "งานตัดอะคริลิก" },
     { value: "สติ๊กเกอร์ไดคัททั่วไป / ฉลากสินค้า / ตัวอักษร", label: "สติ๊กเกอร์ไดคัททั่วไป / ฉลากสินค้า / ตัวอักษร" },
     { value: "แผ่นแจกโฆษณา 1 หน้า / ใบปลิว 1 หรือ 2 หน้า", label: "แผ่นแจกโฆษณา 1 หน้า / ใบปลิว 1 หรือ 2 หน้า" },
     { value: "การ์ดเชิญงานแต่ง, งานบวช ฯลฯ", label: "การ์ดเชิญงานแต่ง, งานบวช ฯลฯ" },
@@ -24,13 +24,13 @@ function AddSubWork() {
     { value: "ยิงเลเซอร์แกะลายบนสแตนเลส", label: "ยิงเลเซอร์แกะลายบนสแตนเลส" },
     { value: "ตู้ไฟติดฟิล์มหรือสติ๊กเกอร์โปร่งแสง", label: "ตู้ไฟติดฟิล์มหรือสติ๊กเกอร์โปร่งแสง" },
     { value: "พิมพ์นามบัตร 1 หน้า / 2 หน้า", label: "พิมพ์นามบัตร 1 หน้า / 2 หน้า" },
-    { value: "กระดาษพีพีกันน้ำ ไม่ยืดหด", label: "กระดาษพีพีกันน้ำ ไม่ยืดหด" },
-    { value: "แผ่นพลาสวูดหนา เบา ตัดง่าย", label: "แผ่นพลาสวูดหนา เบา ตัดง่าย" },
+    { value: "กระดาษพีพีกันน้ำ", label: "กระดาษพีพีกันน้ำ" },
+    { value: "แผ่นพลาสวูดหนา", label: "แผ่นพลาสวูดหนา" },
     { value: "ตรายางหมึกในตัว หรือหมึกแยก", label: "ตรายางหมึกในตัว หรือหมึกแยก" },
     { value: "ป้ายสแตนเลสกัดกรด", label: "ป้ายสแตนเลสกัดกรด" },
     { value: "งานพิมพ์ลงบนวัสดุ PVC มีด้านเงา/ด้าน", label: "งานพิมพ์ลงบนวัสดุ PVC มีด้านเงา/ด้าน" },
     { value: "สติ๊กเกอร์ติดแผ่นอะคริลิก", label: "สติ๊กเกอร์ติดแผ่นอะคริลิก" },
-    { value: "สติ๊กเกอร์ฝ้า ใช้ติดกระจกเพื่อความเป็นส่วนตัว", label: "สติ๊กเกอร์ฝ้า ใช้ติดกระจกเพื่อความเป็นส่วนตัว" },
+    { value: "สติ๊กเกอร์ฝ้า ", label: "สติ๊กเกอร์ฝ้า " },
     { value: "สติ๊กเกอร์ซีทรู", label: "สติ๊กเกอร์ซีทรู" },
     { value: "ปริ้นสติ๊กเกอร์ติดโฟมบอร์ด", label: "ปริ้นสติ๊กเกอร์ติดโฟมบอร์ด" },
     { value: "สติ๊กเกอร์ติดแผ่น PP Board / ฟิวเจอร์บอร์ด", label: "สติ๊กเกอร์ติดแผ่น PP Board / ฟิวเจอร์บอร์ด" },
@@ -49,6 +49,7 @@ function AddSubWork() {
     description: '',
     assigned_to: '',
     due_date: '',
+    price:'',
     status: 'เลือกสถานะ',
     team: ''
   });
@@ -115,6 +116,7 @@ function AddSubWork() {
       setFormData({
         works_name: '',
         work_type: '',
+        price:'',
         project_id: '',
         description: '',
         assigned_to: '',
@@ -145,7 +147,7 @@ function AddSubWork() {
           </div>
 
           <form onSubmit={handleSubmit} className="user-form">
-            {/* โปรเจกต์ */}
+            
             <div className="form-group">
               <label>โปรเจกต์</label>
               <select
@@ -163,7 +165,7 @@ function AddSubWork() {
               </select>
             </div>
 
-            {/* ทีม */}
+            
             <div className="form-group">
               <label>ทีม</label>
               <select
@@ -181,7 +183,7 @@ function AddSubWork() {
               </select>
             </div>
 
-            {/* ผู้รับผิดชอบ */}
+            
             <div className="form-group">
               <label>ผู้รับผิดชอบ</label>
               <select
@@ -200,7 +202,7 @@ function AddSubWork() {
               </select>
             </div>
 
-            {/* ชื่องานย่อย */}
+            
             <div className="form-group">
               <label>ชื่องาน</label>
               <input
@@ -226,7 +228,19 @@ function AddSubWork() {
               />
             </div>
 
-            {/* รายละเอียด */}
+            <div className="form-group">
+              <label>ราคา</label>
+              <input
+                type="text"
+                name="price"
+                autoComplete="off"
+                value={formData.price}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            
             <div className="form-group">
               <label>รายละเอียด</label>
               <textarea
@@ -236,7 +250,7 @@ function AddSubWork() {
               ></textarea>
             </div>
 
-            {/* วันครบกำหนด */}
+            
             <div className="form-group">
               <label>วันครบกำหนด</label>
               <input
@@ -248,7 +262,7 @@ function AddSubWork() {
               />
             </div>
 
-            {/* สถานะ */}
+            
             <div className="form-group">
               <label>สถานะ</label>
               <select

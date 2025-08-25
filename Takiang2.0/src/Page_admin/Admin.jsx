@@ -75,7 +75,13 @@ function Admin() {
       setShowEmployeeModal(true);
     }
   };
+  
 
+   const teamNames = {
+    admin: 'แอดมิน',
+    graphics: 'กราฟิก',
+    marketing: 'การตลาด',
+  };
   // ===== Pagination (ปลอดภัยด้วย toArray) =====
   const safeProjects = toArray(projects);
   const totalPages = Math.max(1, Math.ceil(safeProjects.length / rowsPerPage));
@@ -102,13 +108,13 @@ function Admin() {
               onChange={handleTeamChange}
               className="select-custom"
             >
-              <option value="admin">Admin</option>
-              <option value="graphics">Graphics</option>
-              <option value="marketing">Marketing</option>
+              <option value="admin">แอดมิน</option>
+              <option value="graphics">กราฟิก</option>
+              <option value="marketing">การตลาด</option>
             </select>
           </div>
 
-          <p style={{ fontSize: '20px' }}>โปรเจกต์ที่รับผิดชอบโดยทีม: {team}</p>
+          <p style={{ fontSize: '20px' }}>โปรเจกต์ที่รับผิดชอบโดยทีม: {teamNames[team]}</p>
 
           {currentProjects.length === 0 ? (
             <p>ยังไม่มีโปรเจกต์</p>
@@ -187,6 +193,7 @@ function Admin() {
                         <th>รหัสงาน</th>
                         <th>ชื่องาน</th>
                         <th>ประเภทงาน</th>
+                        <th>ราคา</th>
                         <th>รายละเอียด</th>
                         <th>ผู้รับผิดชอบ</th>
                         <th>กำหนดส่ง</th>
@@ -215,6 +222,7 @@ function Admin() {
                             <td>{work?.work_id ?? '-'}</td>
                             <td>{work?.works_name ?? '-'}</td>
                             <td>{work?.work_type ?? '-'}</td>
+                            <td>{work?.price ?? '-'}</td>
                             <td>{work?.description ?? '-'}</td>
                             <td
                               onClick={(e) => {

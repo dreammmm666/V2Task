@@ -13,12 +13,7 @@ function Navbar() {
   return (
     <nav className="navbar">
       <ul className="navbar__menu">
-        <li className="navbar__item">
-          <a href="/index_user" className="navbar__link">
-            <i data-feather="calendar"></i>
-            <span>ตารางงานของทีม</span>
-          </a>
-        </li>
+       
         <li className="navbar__item">
           <a href="/Mywork_user" className="navbar__link">
             <i data-feather="briefcase"></i>
@@ -38,12 +33,12 @@ function Navbar() {
           </a>
           
         </li>
-        <li className="navbar__item">
+       {/* <li className="navbar__item">
           <a href="/Completed_work" className="navbar__link">
             <i data-feather="check-square"></i>
             <span>จํานวนงานที่เรียบร้อย</span>
           </a>
-        </li>
+        </li>*/}
         <li className="navbar__item">
           <a href="/Profile" className="navbar__link">
             <i data-feather="user"></i>

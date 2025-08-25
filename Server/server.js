@@ -21,7 +21,9 @@ const allowedOrigins = process.env.NODE_ENV === 'production'
       'https://v2taskk.onrender.com', // domain จริงของ frontend
       'https://www.v2taskk.onrender.com' // เพิ่มถ้ามี www
     ]
-  : ['http://localhost:5173'];        // local dev
+  : ['http://localhost:5173',
+    'http://localhost:5174'
+  ];        // local dev
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -188,6 +190,7 @@ app.get('/api/works/user/:assigned_to', async (req, res) => {
       `SELECT 
         w.work_id,
         w.works_name,
+        w.price,
         w.description,
         w.due_date,
         w.work_type,
@@ -213,6 +216,7 @@ app.get('/api/works/user/:username', async (req, res) => {
         w.work_id,
         w.works_name,
         w.description,
+        w.price,
         w.due_date,
         w.status,
         p.project_name
@@ -304,20 +308,25 @@ app.get('/api/submitted-works/:username', async (req, res) => {
   const { username } = req.params;
   try {
     const [rows] = await pool.query(
-      `SELECT username, project_id, works_id, round_number, link, submitted_date, status, reviewer_comment
-       FROM submitted_works
-       WHERE username = ?`,
+      `SELECT sw.username, sw.project_id, p.project_name, 
+              sw.works_id, w.works_name,
+              sw.round_number, sw.link, sw.submitted_date, sw.status, sw.reviewer_comment
+       FROM submitted_works sw
+       LEFT JOIN projects p ON sw.project_id = p.project_id
+       LEFT JOIN works w ON sw.works_id = w.work_id
+       WHERE sw.username = ?`,
       [username]
     );
     res.json(rows);
   } catch (error) {
     console.error('Error fetching submitted works:', error);
-    res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงข้อมูล' });
+    res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงข้อมูล', error: error.message });
   }
 });
 
 
-// ตัวอย่าง Express API: GET /api/profile/:username
+
+
 app.get('/api/profile/:username', async (req, res) => {
   const { username } = req.params;
   try {
@@ -381,14 +390,25 @@ app.get('/api/employees', async (req, res) => {
   }
 });
 
+//สําหรับหน้าตรวจสอบงาน
 app.get('/api/submitted-works', async (req, res) => {
   try {
-    const [rows] = await db.query('SELECT * FROM submitted_works ORDER BY submitted_date DESC');
+    const [rows] = await db.query(`
+      SELECT sw.*, 
+             p.project_name, 
+             w.works_name
+      FROM submitted_works sw
+      JOIN projects p ON sw.project_id = p.project_id
+      JOIN works w ON sw.works_id = w.work_id
+      ORDER BY sw.submitted_date DESC
+    `);
     res.json(rows);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'เกิดข้อผิดพลาดในการดึงข้อมูล' });
   }
 });
+
 
 app.put('/api/submitted-works/update', async (req, res) => {
   const { username, project_id, works_id, round_number, status, reviewer_comment } = req.body;
@@ -487,10 +507,10 @@ app.post('/api/projects', async (req, res) => {
 function getPrefix(workType) {
   switch (workType) {
     case 'แผ่นอะคริลิกตัดตรงหรือเลเซอร์': return 'AL';
-    case 'ฟิล์มโปร่งแสง ใช้กับป้ายไฟ': return 'BL';
+    case 'ฟิล์มโปร่งแสง ': return 'BL';
     case 'แผ่นพับประชาสัมพันธ์': return 'BR';
-    case 'งานตัดพลาสวูดด้วยเครื่อง CNC': return 'CNC-PW';
-    case 'งานตัดอะคริลิกด้วยเครื่อง CNC': return 'CNC-AL';
+    case 'งานตัดพลาสวูด': return 'CNC-PW';
+    case 'งานตัดอะคริลิก': return 'CNC-AL';
     case 'สติ๊กเกอร์ไดคัททั่วไป / ฉลากสินค้า / ตัวอักษร': return 'STK-DC';
     case 'แผ่นแจกโฆษณา 1 หน้า / ใบปลิว 1 หรือ 2 หน้า': return 'FL';
     case 'การ์ดเชิญงานแต่ง, งานบวช ฯลฯ': return 'GC';
@@ -498,13 +518,13 @@ function getPrefix(workType) {
     case 'ยิงเลเซอร์แกะลายบนสแตนเลส': return 'LS-ENG';
     case 'ตู้ไฟติดฟิล์มหรือสติ๊กเกอร์โปร่งแสง': return 'LB';
     case 'พิมพ์นามบัตร 1 หน้า / 2 หน้า': return 'NC';
-    case 'กระดาษพีพีกันน้ำ ไม่ยืดหด': return 'PP';
-    case 'แผ่นพลาสวูดหนา เบา ตัดง่าย': return 'PW';
+    case 'กระดาษพีพีกันน้ำ': return 'PP';
+    case 'แผ่นพลาสวูดหนา': return 'PW';
     case 'ตรายางหมึกในตัว หรือหมึกแยก': return 'RM';
     case 'ป้ายสแตนเลสกัดกรด': return 'SS-ET';
     case 'งานพิมพ์ลงบนวัสดุ PVC มีด้านเงา/ด้าน': return 'STK';
     case 'สติ๊กเกอร์ติดแผ่นอะคริลิก': return 'STK-AL';
-    case 'สติ๊กเกอร์ฝ้า ใช้ติดกระจกเพื่อความเป็นส่วนตัว': return 'STK-FR';
+    case 'สติ๊กเกอร์ฝ้า': return 'STK-FR';
     case 'สติ๊กเกอร์ซีทรู': return 'STK-C2';
     case 'ปริ้นสติ๊กเกอร์ติดโฟมบอร์ด': return 'STK-FB';
     case 'สติ๊กเกอร์ติดแผ่น PP Board / ฟิวเจอร์บอร์ด': return 'STK-PP';
@@ -546,7 +566,7 @@ async function generateUniqueWorkId(workType) {
 // API เพิ่มงานย่อย
 app.post('/api/works', async (req, res) => {
   try {
-    const { works_name, work_type, project_id, description, assigned_to, due_date, status } = req.body;
+    const { works_name, work_type, project_id, price, description, assigned_to, due_date, status } = req.body;
 
     if (!works_name || !work_type || !project_id || !assigned_to || !due_date || !status) {
       return res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
@@ -556,9 +576,9 @@ app.post('/api/works', async (req, res) => {
 
     await db.query(
       `INSERT INTO works 
-       (work_id, works_name, work_type, project_id, description, assigned_to, due_date, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [work_id, works_name, work_type, project_id, description || '', assigned_to, due_date, status]
+       (work_id, works_name, work_type, project_id, price, description, assigned_to, due_date, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [work_id, works_name, work_type, project_id, price || 0.00, description || '', assigned_to, due_date, status]
     );
 
     res.json({ message: 'เพิ่มงานย่อยสำเร็จ', work_id });
@@ -567,6 +587,7 @@ app.post('/api/works', async (req, res) => {
     res.status(500).json({ message: 'เพิ่มงานย่อยล้มเหลว' });
   }
 });
+
 
 // ดึงรายชื่อพนักงานพร้อม username ที่ผูกไว้
 app.get('/api/employees-with-users', async (req, res) => {
@@ -584,7 +605,6 @@ app.get('/api/employees-with-users', async (req, res) => {
   }
 });
 
-// ดึงทีมทั้งหมด (เอามาใส่ใน dropdown ทีม)
 app.get('/api/teams', async (req, res) => {
   try {
     const [rows] = await db.query(`
@@ -633,7 +653,7 @@ app.get('/api/projects/inprogress', async (req, res) => {
   }
 });
 
-// (option) ถ้าต้องการกรองตามทีมด้วย
+
 app.get('/api/projects/team/:team/inprogress', async (req, res) => {
   const { team } = req.params;
   try {
@@ -746,12 +766,15 @@ app.put('/api/:table/:id', async (req, res) => {
 });
 
 //ดึงลูกค้าหน้าแก้ไข
+// ดึงข้อมูลลูกค้าตาม id
 app.get('/api/customers/:id', async (req, res) => {
   const customerId = req.params.id;
 
   try {
     const [rows] = await pool.query(
-      'SELECT customer_id, customer_name, gender, phone, other_contact FROM customers WHERE customer_id = ?',
+      `SELECT customer_id, customer_name, gender, phone, other_contact, tax_id, billing_address, email
+       FROM customers 
+       WHERE customer_id = ?`,
       [customerId]
     );
 
@@ -766,14 +789,17 @@ app.get('/api/customers/:id', async (req, res) => {
   }
 });
 
+// อัปเดตข้อมูลลูกค้าตาม id
 app.put('/api/customers/:id', async (req, res) => {
   const customerId = req.params.id;
-  const { customer_name, gender, phone, other_contact } = req.body;
+  const { customer_name, gender, phone, other_contact, tax_id, billing_address, email } = req.body;
 
   try {
     const [result] = await pool.query(
-      `UPDATE customers SET customer_name = ?, gender = ?, phone = ?, other_contact = ? WHERE customer_id = ?`,
-      [customer_name, gender, phone, other_contact, customerId]
+      `UPDATE customers 
+       SET customer_name = ?, gender = ?, phone = ?, other_contact = ?, tax_id = ?, billing_address = ?, email = ?
+       WHERE customer_id = ?`,
+      [customer_name, gender, phone, other_contact, tax_id, billing_address, email, customerId]
     );
 
     if (result.affectedRows === 0) {
@@ -787,13 +813,17 @@ app.put('/api/customers/:id', async (req, res) => {
   }
 });
 
+
 app.get('/api/works/:id', async (req, res) => {
   const workId = req.params.id;
 
   try {
-    const [rows] = await pool.query(
-      `SELECT work_id, works_name, work_type, description, assigned_to, 
-              DATE_FORMAT(due_date, '%Y-%m-%d') AS due_date, status
+    const [rows] = await db.query(
+      `SELECT work_id, works_name, work_type,
+              IFNULL(price, 0.00) AS price,  -- ป้องกัน NULL
+              description, assigned_to,
+              DATE_FORMAT(due_date, '%Y-%m-%d') AS due_date,
+              status
        FROM works
        WHERE work_id = ?`,
       [workId]
@@ -813,14 +843,14 @@ app.get('/api/works/:id', async (req, res) => {
 // แก้ไขข้อมูลงานย่อยตาม work_id
 app.put('/api/works/:id', async (req, res) => {
   const workId = req.params.id;
-  const { works_name, work_type, description, assigned_to, due_date, status } = req.body;
+  const { works_name, work_type, description, assigned_to,price, due_date, status } = req.body;
 
   try {
     const [result] = await pool.query(
       `UPDATE works 
-       SET works_name = ?, work_type = ?, description = ?, assigned_to = ?, due_date = ?, status = ? 
+       SET works_name = ?, work_type = ?,price = ?, description = ?, assigned_to = ?, due_date = ?, status = ? 
        WHERE work_id = ?`,
-      [works_name, work_type, description, assigned_to, due_date, status, workId]
+      [works_name, work_type, description, assigned_to,price, due_date, status, workId]
     );
 
     if (result.affectedRows === 0) {

@@ -120,6 +120,10 @@ tr:hover {
   padding: 12px 15px;
   text-align: left;
   border: 1px solid #cdcdcd;
+  max-width: 200px;       /* ขนาดกลาง ๆ ปรับได้ตามชอบ */
+  white-space: normal;    /* ขึ้นบรรทัดใหม่ */
+  word-wrap: break-word;  /* ตัดคำยาว ๆ ให้ขึ้นบรรทัดใหม่ */
+  font-size: 11px;
 }
 
 .styled-table thead {
@@ -130,6 +134,7 @@ tr:hover {
 
 .styled-table tbody tr {
   border-bottom: 1px solid #dddddd;
+  
 }
 
 
@@ -449,7 +454,7 @@ tr:hover {
   padding: 10px 16px;
   background-color: #e1a54a; 
   color: white;
-  font-weight: 600;
+  font-weight: 400;
   border: none;
   border-radius: 6px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -636,3 +641,4 @@ background-color: #d5c63f;
 .btSearch:hover{
   background-color: #617e5b;
 }
+

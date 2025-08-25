@@ -14,6 +14,22 @@ body {
   padding: 1rem 0;
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.03);
   height: calc(100vh - 4rem);
+  overflow-y: auto;         /* เปิด scroll แนวตั้ง */
+  overflow-x: hidden;
+   width: 6rem;
+   overflow: visible;
+}
+.navbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.navbar::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 3px;
+}
+
+.navbar::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .navbar__link {
@@ -25,11 +41,13 @@ body {
   width: calc(1rem * 5.5);
   color: #6a778e;
   transition: 250ms ease all;
+  
 }
 
 .navbar__link span {
-  position: absolute;
-  left: 100%;
+   position: fixed;             /* ให้ลอยเหนือกรอบ */
+  left: 6rem;      
+  
   transform: translate(-3rem);
   margin-left: 1rem;
   opacity: 0;
@@ -39,6 +57,7 @@ body {
   padding: 0.75rem;
   transition: 250ms ease all;
   border-radius: calc(10px * 1.75);
+  
 }
 
 .navbar__link:hover {
@@ -55,6 +74,8 @@ body {
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 
@@ -72,19 +93,20 @@ span{white-space: nowrap;         /* ไม่ตัดบรรทัด */
 }
 
 
-
 .navbar__item.has-submenu {
-  position: relative;
+   position: relative;
+  z-index: 9999;
 }
 
 .submenu {
-  background-color: #fff;
+  background-color: #f7f7f7;
   position: absolute;
   top: 100%;
-  left: 0;
+    left: 0%;     
+   
   min-width: 200px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
+  z-index: 9999;
   
 }
 
@@ -94,7 +116,8 @@ span{white-space: nowrap;         /* ไม่ตัดบรรทัด */
   padding: 10px 15px;
   color: #333;
   text-decoration: none;
-  background-color: #f9f9f9;
+  background-color: #ffffff;
+  
 }
 
 .submenu li a:hover {
@@ -110,10 +133,12 @@ span{white-space: nowrap;         /* ไม่ตัดบรรทัด */
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  color: #fff;
+  color: #333;                    
   text-decoration: none;
-  transition: background-color 0.3s ease;
+  background: #fff;
+  transition: background-color .2s ease;
   font-size: 15px;
+  border-radius: 8px;
 }
 
 /* เมื่อ hover ที่ลิงก์ในเมนูย่อย */
@@ -127,4 +152,37 @@ span{white-space: nowrap;         /* ไม่ตัดบรรทัด */
 .submenu i {
   width: 20px;
   height: 20px;
+}
+
+
+.navbar-scroll {
+  height: 100%;
+  overflow-y: visible;     /* ใช้ scroll ที่นี่แทน */
+  overflow-x: hidden;   /* ป้องกันสกรอลแนวนอน */
+  position: relative; 
+}
+
+
+.tooltip {
+  position: fixed;          /* ใช้ fixed เพื่อให้อยู่นอก flow */
+  left: 6rem;               /* ระยะจากขอบซ้ายเท่ากับความกว้าง navbar */
+  padding: 0.6rem 0.9rem;
+  background: #fff;
+  color: #406ff3;
+  border-radius: 18px;
+  opacity: 0;
+  transform: translateX(1rem);
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  z-index: 9999;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* แสดง tooltip เมื่อ hover */
+.navbar__link:hover .tooltip {
+  opacity: 1;
+  transform: translateX(0);
 }

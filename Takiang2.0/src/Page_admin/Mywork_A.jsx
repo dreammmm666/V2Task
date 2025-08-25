@@ -51,9 +51,10 @@ function MyWorkTable() {
             <thead>
               <tr>
                 <th>ชื่อโปรเจกต์</th>
-                <th>รหัสงาน</th>
+               
                 <th>ชื่องาน</th>
                 <th>ประเภทงาน</th>
+                <th>ราคา</th>
                 <th>รายละเอียด</th>
                 <th>วันครบกำหนด</th>
                 <th>สถานะ</th>
@@ -79,9 +80,9 @@ function MyWorkTable() {
                     }
                   >
                     <td>{work.project_name}</td>
-                    <td>{work.work_id}</td>
                     <td>{work.works_name}</td>
                     <td>{work.work_type}</td>
+                    <td>{work.price}</td>
                     <td>{work.description}</td>
                     <td>{work.due_date ? new Date(work.due_date).toLocaleDateString('th-TH') : '-'}</td>
                     <td>{work.status}</td>

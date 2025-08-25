@@ -119,8 +119,8 @@ function CheckWorkAdmin() {
             <thead>
               <tr>
                 <th>ผู้ส่ง</th>
-                <th>โปรเจค</th>
-                <th>งาน</th>
+                <th>ชื่อโปรเจค</th>
+                <th>ชื่องาน</th>
                 <th>รอบ</th>
                 <th>ลิงก์งาน</th>
                 <th>วันที่ส่ง</th>
@@ -139,8 +139,8 @@ function CheckWorkAdmin() {
                   <tr key={`${work.username}-${work.project_id}-${work.works_id}-${work.round_number}`} 
                       style={{ backgroundColor: getStatusColor(work.status) }}>
                     <td>{work.username}</td>
-                    <td>{work.project_id}</td>
-                    <td>{work.works_id}</td>
+                    <td>{work.project_name}</td>
+                    <td>{work.works_name}</td>
                     <td>{work.round_number}</td>
                     <td><a href={work.link} target="_blank" rel="noreferrer">ลิงก์งาน</a></td>
                     <td>{new Date(work.submitted_date).toLocaleDateString('th-TH')}</td>
@@ -163,7 +163,7 @@ function CheckWorkAdmin() {
             <div className="modal-overlay">
               <div className="modal-content">
                 <h3>แก้ไขสถานะงาน</h3>
-                <p><b>โปรเจค:</b> {editingWork.project_id} <b>งาน:</b> {editingWork.works_id} <b>รอบ:</b> {editingWork.round_number}</p>
+                <p><b>โปรเจค:</b> {editingWork.project_name} <b>งาน:</b> {editingWork.works_name} <b>รอบ:</b> {editingWork.round_number}</p>
                 <br/>
                 <label>สถานะใหม่</label>
                 <select value={newStatus} onChange={e => setNewStatus(e.target.value)} className='select-custom'>

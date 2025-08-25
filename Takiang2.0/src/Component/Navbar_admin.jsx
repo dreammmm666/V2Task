@@ -21,12 +21,14 @@ function Navbar() {
   }, [showSubmenu]);
 
   return (
+    
     <nav className="navbar">
+      <div class="navbar-scroll">
       <ul className="navbar__menu">
         <li className="navbar__item">
           <a href="/Admin" className="navbar__link">
             <i data-feather="calendar"></i>
-            <span>ตารางงานของทีม</span>
+            <span className='tooltip'>ตารางงานของทีม</span>
           </a>
         </li>
         <li className="navbar__item">
@@ -47,12 +49,12 @@ function Navbar() {
             <span>สถานะของงานที่ส่งตรวจ</span>
           </a>
         </li>
-        <li className="navbar__item">
+        {/* <li className="navbar__item">
           <a href="/Completed_work_A" className="navbar__link">
             <i data-feather="check-square"></i>
             <span>จำนวนงานที่เรียบร้อย</span>
           </a>
-        </li>
+        </li>*/}
         <li className="navbar__item">
           <a href="/CheckWork" className="navbar__link">
             <i data-feather="search"></i>
@@ -69,7 +71,33 @@ function Navbar() {
   </a>
   {showSubmenu && (
     <ul className="submenu">
-      <li>
+      <li className="navbar__item">
+          <a href="/AddCustomer" className="navbar__link">
+            <i data-feather="user-plus"></i>
+            <span>เพิ่มข้อมูลลูกค้า</span>
+          </a>
+        </li>
+
+        <li className="navbar__item">
+          <a href="/AddProject" className="navbar__link">
+            <i data-feather="folder-plus"></i>
+            <span>เพิ่มโปรเจกต์</span>
+          </a>
+        </li>
+        
+        <li className="navbar__item">
+          <a href="/AddJob" className="navbar__link">
+           <i data-feather="plus-circle"></i>
+            <span>เพิ่มงานย่อย</span>
+          </a>
+        </li>
+        <li className="navbar__item">
+          <a href="/EditData" className="navbar__link">
+           <i data-feather="edit"></i>
+            <span>แก้ไขข้อมูล</span>
+          </a>
+        </li>
+      {/*<li  >
         <a href="/AddCustomer">
           <i data-feather="user-plus"></i>
           <span>เพิ่มข้อมูลลูกค้า</span>
@@ -92,7 +120,8 @@ function Navbar() {
           <i data-feather="edit"></i>
           <span>แก้ไขข้อมูล</span>
         </a>
-      </li>
+      </li>*/}
+      
     </ul>
   )}
 </li>
@@ -117,7 +146,9 @@ function Navbar() {
           </a>
         </li>
       </ul>
+      </div>
     </nav>
+    
   );
 }
 
