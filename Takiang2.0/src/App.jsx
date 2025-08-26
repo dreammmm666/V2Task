@@ -22,7 +22,9 @@ import CheckWork from './Page_admin/CheckWork'
 import AddProject from './Page_admin/AddProject'
 import AddJob from './Page_admin/AddJob'
 import EditData from './Page_admin/EditData'
-
+import Consider from './Page_Consider/Consider'
+import Profile_C from './Page_Consider/Profile_C'
+import ReviewWorks from './Page_Consider/ReviewWorks'
 function App() {
   return (
     <Router>
@@ -86,6 +88,15 @@ function App() {
         } />
         <Route path="/EditData" element={
           <RequireAuth><EditData /></RequireAuth>
+        } />
+        <Route path="/Consider" element={
+          <RequireAuth><Consider /></RequireAuth>
+        } />
+        <Route path="/Profile_C" element={
+          <RequireAuth><Profile_C /></RequireAuth>
+        } />
+        <Route path="/ReviewWorks" element={
+          <RequireAuth><ReviewWorks /></RequireAuth>
         } />
       </Routes>
     </Router>

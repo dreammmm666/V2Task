@@ -864,6 +864,74 @@ app.put('/api/works/:id', async (req, res) => {
   }
 });
 
+// ดึงงานที่ status = 'ผ่าน' ทั้งหมด
+app.get('/api/submitted-works/passed', async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT *
+      FROM submitted_works
+      WHERE status = 'ผ่าน'
+    `);
+    console.log('Passed works:', rows); // <-- debug
+    res.json(rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+// บันทึกงานที่ผ่านเข้า reviewed_works
+app.post('/api/reviewed-works', async (req, res) => {
+  const { submitted_id, username, project_id, works_id, round_number, reviewer_comment } = req.body;
+  try {
+    await pool.query(
+      `INSERT INTO reviewed_works 
+       (submitted_id, username, project_id, works_id, round_number, review_date, status, reviewer_comment)
+       VALUES (?, ?, ?, ?, ?, CURDATE(), 'ผ่าน', ?)`,
+      [submitted_id, username, project_id, works_id, round_number, reviewer_comment]
+    );
+    res.json({ message: 'บันทึกผลการตรวจสอบเรียบร้อย' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Insert error' });
+  }
+});
+
+// อัปเดตงานเป็นไม่ผ่าน โดยใช้ submitted_id
+app.put('/api/submitted-works/fail/:submitted_id', async (req, res) => {
+  const { submitted_id } = req.params;
+  const { reviewer_comment } = req.body;
+  try {
+    await pool.query(
+      `UPDATE submitted_works 
+       SET status = 'ไม่ผ่าน', reviewer_comment = ? 
+       WHERE submitted_id = ?`,
+      [reviewer_comment, submitted_id]
+    );
+    res.json({ message: 'อัปเดตสถานะเป็นไม่ผ่านแล้ว' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Update error' });
+  }
+});
+
+app.get('/api/submitted-works/all', async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT *
+      FROM submitted_works
+      ORDER BY submitted_date DESC
+    `);
+    console.log('All submitted works:', rows); // debug
+    res.json(rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+
+
 
 // ----- SPA Fallback: ใช้ RegExp แทน "*" -----
 app.get(/.*/, (req, res) => {
