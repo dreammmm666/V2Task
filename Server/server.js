@@ -865,18 +865,24 @@ app.put('/api/works/:id', async (req, res) => {
 });
 
 // ดึงงานที่ status = 'ผ่าน' ทั้งหมด
-app.get('/api/submitted-works/passed', async (req, res) => {
+app.get('/api/submitted-works/P', async (req, res) => {
   try {
     const [rows] = await pool.query(`
       SELECT *
       FROM submitted_works
       WHERE status = 'ผ่าน'
     `);
-    console.log('Passed works:', rows); // <-- debug
-    res.json(rows);
+
+    if (rows.length === 0) {
+      // กรณีไม่มีงานที่ผ่าน
+      return res.status(404).json({ error: 'ไม่พบงานที่ผ่านการตรวจสอบ' });
+    }
+
+    console.log('Passed works:', rows); // debug: ตรวจสอบข้อมูลที่ดึงมา
+    res.json(rows); // ส่งกลับทั้งหมดเป็น array
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Database error' });
+    console.error('Error fetching passed works:', error);
+    res.status(500).json({ error: 'เกิดข้อผิดพลาดในการดึงข้อมูลงานที่ผ่าน' });
   }
 });
 

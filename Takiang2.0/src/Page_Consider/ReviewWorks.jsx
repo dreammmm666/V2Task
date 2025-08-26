@@ -6,16 +6,24 @@ import Navbar from '../Component/Navbar_C';
 function ReviewWorks() {
   const [works, setWorks] = useState([]);
 
-  // ดึงงานที่ผ่าน
   useEffect(() => {
-    axios.get('/api/submitted-works/passed')
-      .then(res => setWorks(res.data))
-      .catch(err => console.error('Error fetching passed works:', err));
+    fetchWorks();
   }, []);
 
-  // ฟังก์ชันบันทึกงานผ่าน
+  const fetchWorks = async () => {
+    try {
+      const res = await axios.get('/api/submitted-works/');
+      // กรองเฉพาะงานที่ผ่านชั้นแรก
+      const filtered = res.data.filter(w => w.status === 'ผ่าน');
+      setWorks(filtered);
+    } catch (err) {
+      console.error('Error fetching works:', err);
+    }
+  };
+
   const handlePass = async (work) => {
     try {
+      // เรียก API บันทึกงานที่ผ่าน
       await axios.post('/api/reviewed-works', {
         submitted_id: work.submitted_id,
         username: work.username,
@@ -25,33 +33,50 @@ function ReviewWorks() {
         reviewer_comment: 'ตรวจสอบแล้ว - ผ่าน'
       });
       Swal.fire('สำเร็จ', 'บันทึกผลการตรวจสอบแล้ว', 'success');
-      setWorks(works.filter(w => w.submitted_id !== work.submitted_id));
+
+      // ซ่อนแถวงานนั้นจากตาราง
+      setWorks(prev => prev.filter(w => w.submitted_id !== work.submitted_id));
+
     } catch (error) {
-      Swal.fire('ผิดพลาด', 'ไม่สามารถบันทึกได้', 'error');
+      console.error(error);
+      Swal.fire('ผิดพลาด', 'ไม่สามารถบันทึกงานได้', 'error');
     }
   };
 
-  // ฟังก์ชันอัปเดตงานไม่ผ่าน
-  const handleFail = async (work) => {
-    try {
+const handleFail = async (work) => {
+  try {
+    const { value: comment } = await Swal.fire({
+      title: 'กรุณาใส่คอมเมนต์',
+      input: 'textarea',
+      
+      inputPlaceholder: 'ใส่คอมเมนต์ที่นี่...',
+      showCancelButton: true,
+      inputValidator: (value) => {
+        if (!value) {
+          return 'คุณต้องใส่คอมเมนต์ก่อน!';
+        }
+      }
+    });
+
+    if (comment) {
       await axios.put(`/api/submitted-works/fail/${work.submitted_id}`, {
-        reviewer_comment: 'ตรวจสอบแล้ว - ไม่ผ่าน'
+        reviewer_comment: comment
       });
       Swal.fire('อัปเดตแล้ว', 'สถานะงานถูกเปลี่ยนเป็นไม่ผ่าน', 'success');
-      setWorks(works.filter(w => w.submitted_id !== work.submitted_id));
-    } catch (error) {
-      Swal.fire('ผิดพลาด', 'ไม่สามารถอัปเดตได้', 'error');
-    }
-  };
 
-  // แปลงวันที่
+      // ซ่อนแถวงานนั้นจากตาราง
+      setWorks(prev => prev.filter(w => w.submitted_id !== work.submitted_id));
+    }
+
+  } catch (error) {
+    Swal.fire('ผิดพลาด', 'ไม่สามารถอัปเดตได้', 'error');
+  }
+};
+
   const formatDate = (dateString) => {
     if (!dateString) return '-';
     const d = new Date(dateString);
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
-    return `${day}/${month}/${year}`;
+    return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
   };
 
   return (
@@ -61,45 +86,37 @@ function ReviewWorks() {
         <div className="card">
           <h3>รายการงานที่ผ่านการตรวจสอบชั้นแรก</h3>
 
-          <table className="styled-table" border="1" cellPadding="8" style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead style={{ backgroundColor: '#eee' }}>
+          <table className="styled-table">
+            <thead>
               <tr>
-                <th>ผู้ส่ง</th>
-                <th>โปรเจค</th>
+                <th>ผู้รับผิดชอบ</th>
+                
                 <th>ชื่อโปรเจค</th>
-                <th>งาน</th>
                 <th>ชื่องาน</th>
-                <th>รอบ</th>
+               
                 <th>ลิงก์งาน</th>
-                <th>วันที่ส่ง</th>
-                <th>สถานะ</th>
-                <th>หมายเหตุผู้ตรวจ</th>
+                <th>คอมเมนต์แอดมิน</th>
                 <th>การจัดการ</th>
               </tr>
             </thead>
             <tbody>
               {works.length === 0 ? (
                 <tr>
-                  <td colSpan="11" style={{ textAlign: 'center' }}>ไม่มีงานที่รอการตรวจสอบ</td>
+                  <td colSpan="8" style={{ textAlign: 'center' }}>ไม่มีงานที่ตรงตามสถานะ</td>
                 </tr>
               ) : (
                 works.map(work => (
                   <tr key={work.submitted_id}>
                     <td>{work.username}</td>
-                    <td>{work.project_id}</td>
+                    
                     <td>{work.project_name}</td>
-                    <td>{work.works_id}</td>
                     <td>{work.works_name}</td>
-                    <td>{work.round_number}</td>
-                    <td>
-                      <a href={work.link} target="_blank" rel="noopener noreferrer">เปิดงาน</a>
-                    </td>
-                    <td>{formatDate(work.submitted_date)}</td>
-                    <td>{work.status}</td>
+                    
+                    <td><a href={work.link} target="_blank" rel="noopener noreferrer">เปิดงาน</a></td>
                     <td>{work.reviewer_comment || '-'}</td>
                     <td>
-                      <button onClick={() => handlePass(work)}>ผ่าน</button>
-                      <button onClick={() => handleFail(work)}>ไม่ผ่าน</button>
+                      <button onClick={() => handlePass(work)} className='button-save'>ผ่าน</button>
+                      <button onClick={() => handleFail(work)} className='button-cancel'>ไม่ผ่าน</button>
                     </td>
                   </tr>
                 ))
