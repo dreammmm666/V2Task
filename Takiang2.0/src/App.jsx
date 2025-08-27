@@ -22,9 +22,13 @@ import CheckWork from './Page_admin/CheckWork'
 import AddProject from './Page_admin/AddProject'
 import AddJob from './Page_admin/AddJob'
 import EditData from './Page_admin/EditData'
+import Work_completed from './Page_admin/work_completed'
+
 import Consider from './Page_Consider/Consider'
 import Profile_C from './Page_Consider/Profile_C'
 import ReviewWorks from './Page_Consider/ReviewWorks'
+import ReviewWorks_2 from './Page_Consider/ReviewWorks_2'
+import Profile_2 from './Page_Consider/Profile_C_2'
 function App() {
   return (
     <Router>
@@ -97,6 +101,15 @@ function App() {
         } />
         <Route path="/ReviewWorks" element={
           <RequireAuth><ReviewWorks /></RequireAuth>
+        } />
+        <Route path="/ReviewWorks_2" element={
+          <RequireAuth><ReviewWorks_2 /></RequireAuth>
+        } />
+        <Route path="/Profile_2" element={
+          <RequireAuth><Profile_2 /></RequireAuth>
+        } />
+        <Route path="/work_completed" element={
+          <RequireAuth><Work_completed /></RequireAuth>
         } />
       </Routes>
     </Router>

@@ -25,13 +25,19 @@ function Navbar() {
     <nav className="navbar">
       <div class="navbar-scroll">
       <ul className="navbar__menu">
-        <li className="navbar__item">
-          <a href="/Admin" className="navbar__link">
+        {/*<li className="navbar__item">
+          <a href="/Consider" className="navbar__link">
             <i data-feather="calendar"></i>
-            <span className='tooltip'>ตารางงานของทีม</span>
+            <span className='tooltip'>ตารางงานของเเต่ละทีม</span>
+          </a>
+        </li>*/}
+         <li className="navbar__item">
+          <a href="/ReviewWorks_2" className="navbar__link">
+            <i data-feather="search"></i>
+            <span>ตรวจสอบงาน</span>
           </a>
         </li>
-        <li className="navbar__item">
+        {/*<li className="navbar__item">
           <a href="/MyWork_A" className="navbar__link">
             <i data-feather="briefcase"></i>
             <span>งานของฉัน</span>
@@ -42,19 +48,19 @@ function Navbar() {
             <i data-feather="upload-cloud"></i>
             <span>ส่งงานตรวจสอบ</span>
           </a>
-        </li>
-        <li className="navbar__item">
-          <a href="/Status_work_A" className="navbar__link">
+        </li>*/}
+        {/*<li className="navbar__item">
+          <a href="/#" className="navbar__link">
             <i data-feather="check-circle"></i>
             <span>สถานะของงานที่ส่งตรวจ</span>
           </a>
-        </li>
+        </li>*/}
         {/* <li className="navbar__item">
           <a href="/Completed_work_A" className="navbar__link">
             <i data-feather="check-square"></i>
             <span>จำนวนงานที่เรียบร้อย</span>
           </a>
-        </li>*/}
+        </li>
         <li className="navbar__item">
           <a href="/CheckWork" className="navbar__link">
             <i data-feather="search"></i>
@@ -62,7 +68,7 @@ function Navbar() {
           </a>
         </li>
 
-        {/* เพิ่มงาน (Dropdown) */}
+        
         <li className="navbar__item has-submenu">
   <a href="#" className="navbar__link" onClick={toggleSubmenu}>
     <i data-feather="file-plus"></i>
@@ -97,53 +103,24 @@ function Navbar() {
             <span>แก้ไขข้อมูล</span>
           </a>
         </li>
-      {/*<li  >
-        <a href="/AddCustomer">
-          <i data-feather="user-plus"></i>
-          <span>เพิ่มข้อมูลลูกค้า</span>
-        </a>
-      </li>
-      <li>
-        <a href="/AddProject">
-          <i data-feather="folder-plus"></i>
-          <span>เพิ่มโปรเจกต์</span>
-        </a>
-      </li>
-      <li>
-        <a href="/AddJob">
-          <i data-feather="plus-circle"></i>
-          <span>เพิ่มงานย่อย</span>
-        </a>
-      </li>
-      <li>
-        <a href="/EditData">
-          <i data-feather="edit"></i>
-          <span>แก้ไขข้อมูล</span>
-        </a>
-      </li>*/}
+      
       
     </ul>
   )}
-</li>    
-        <li className="navbar__item">
-          <a href="/work_completed" className="navbar__link">
-            <i data-feather="briefcase"></i>
-            <span>งานที่ผ่านการตรวจสอบเเล้ว</span>
-          </a>
-        </li>
+</li>*/}
 
         <li className="navbar__item">
-          <a href="/Profile_A" className="navbar__link">
+          <a href="/Profile_2" className="navbar__link">
             <i data-feather="user"></i>
             <span>ข้อมูลส่วนตัว</span>
           </a>
         </li>
-         <li className="navbar__item">
+         {/* <li className="navbar__item">
           <a href="/Add_user" className="navbar__link">
             <i data-feather="user-plus"></i>
             <span>สร้างบัญชีผู้ใช้</span>
           </a>
-        </li>
+        </li>*/}
 
         <li className="navbar__item logout" onClick={handleLogout}>
           <a href="#" className="navbar__link">

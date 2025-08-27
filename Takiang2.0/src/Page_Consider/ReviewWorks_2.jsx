@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import Navbar from '../Component/Navbar_C';
+import Navbar from '../Component/Navbar_C_2';
 
 function ReviewWorks() {
   const [works, setWorks] = useState([]);
@@ -12,7 +12,7 @@ function ReviewWorks() {
 
   const fetchWorks = async () => {
     try {
-      const res = await axios.get('/api/submitted-works/');
+      const res = await axios.get('/api/reviewed-works');
       // กรองเฉพาะงานที่ผ่านชั้นแรก
       const filtered = res.data.filter(w => w.status === 'ผ่าน');
       setWorks(filtered);
@@ -22,27 +22,28 @@ function ReviewWorks() {
   };
 
   const handlePass = async (work) => {
-    try {
-      // เรียก API บันทึกงานที่ผ่าน
-      await axios.post('/api/reviewed-works', {
-        submitted_id: work.submitted_id,
-        username: work.username,
-        project_id: work.project_id,
-        works_id: work.works_id,
-        round_number: work.round_number,
-        link: work.link,
-        reviewer_comment: 'ตรวจสอบแล้ว - ผ่าน'
-      });
-      Swal.fire('สำเร็จ', 'บันทึกผลการตรวจสอบแล้ว', 'success');
+  try {
+    await axios.post('/api/exported_works', {
+      review_id: work.review_id,
+      submitted_id: work.submitted_id,
+      username: work.username,
+      project_id: work.project_id,
+      works_id: work.works_id,
+      round_number: work.round_number,
+      link: work.link,
+      reviewer_comment: 'ตรวจสอบแล้ว - ผ่าน'
+    });
 
-      // ซ่อนแถวงานนั้นจากตาราง
-      setWorks(prev => prev.filter(w => w.submitted_id !== work.submitted_id));
+    Swal.fire('สำเร็จ', 'ส่งงานไปตารางต่อไปเรียบร้อยเเล้ว', 'success');
 
-    } catch (error) {
-      console.error(error);
-      Swal.fire('ผิดพลาด', 'ไม่สามารถบันทึกงานได้', 'error');
-    }
-  };
+    // ลบงานจาก state
+    setWorks(prev => prev.filter(w => w.review_id !== work.review_id));
+  } catch (error) {
+    console.error(error);
+    Swal.fire('ผิดพลาด', 'ไม่สามารถย้ายงานได้', 'error');
+  }
+};
+
 
 const handleFail = async (work) => {
   try {
@@ -85,13 +86,16 @@ const handleFail = async (work) => {
       <Navbar />
       <div className="content-wrapper">
         <div className="card">
-          <h3>รายการงานที่ผ่านการตรวจสอบจากแอดมินเเล้ว</h3>
+          <h3>รายการงานที่ผ่านการตรวจสอบชั้นสอง</h3>
+
           <table className="styled-table">
             <thead>
               <tr>
                 <th>ผู้รับผิดชอบ</th>
+
                 <th>ชื่อโปรเจค</th>
                 <th>ชื่องาน</th>
+
                 <th>ลิงก์งาน</th>
                 <th>คอมเมนต์แอดมิน</th>
                 <th>การจัดการ</th>

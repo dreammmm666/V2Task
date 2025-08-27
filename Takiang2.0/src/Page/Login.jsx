@@ -55,9 +55,9 @@ function Login() {
   } else if (team === 'admin') {
     navigate('/Admin');
   } else if (team === 'consider1') {
-    navigate('/Consider'); 
+    navigate('/ReviewWorks'); 
   } else if (team === 'consider2') {
-    navigate('/Consider'); 
+    navigate('/ReviewWorks_2'); 
   } else {
     navigate('/');
   }

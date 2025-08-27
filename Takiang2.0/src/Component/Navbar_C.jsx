@@ -25,12 +25,12 @@ function Navbar() {
     <nav className="navbar">
       <div class="navbar-scroll">
       <ul className="navbar__menu">
-        <li className="navbar__item">
+        {/*<li className="navbar__item">
           <a href="/Consider" className="navbar__link">
             <i data-feather="calendar"></i>
             <span className='tooltip'>ตารางงานของเเต่ละทีม</span>
           </a>
-        </li>
+        </li>*/}
          <li className="navbar__item">
           <a href="/ReviewWorks" className="navbar__link">
             <i data-feather="search"></i>

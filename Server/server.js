@@ -888,20 +888,23 @@ app.get('/api/submitted-works/P', async (req, res) => {
 
 // บันทึกงานที่ผ่านเข้า reviewed_works
 app.post('/api/reviewed-works', async (req, res) => {
-  const { submitted_id, username, project_id, works_id, round_number, reviewer_comment } = req.body;
+  const { submitted_id, username, project_id, works_id, round_number, reviewer_comment, link } = req.body;
+
   try {
     await pool.query(
       `INSERT INTO reviewed_works 
-       (submitted_id, username, project_id, works_id, round_number, review_date, status, reviewer_comment)
-       VALUES (?, ?, ?, ?, ?, CURDATE(), 'ผ่าน', ?)`,
-      [submitted_id, username, project_id, works_id, round_number, reviewer_comment]
+       (submitted_id, username, project_id, works_id, round_number, link, review_date, status, reviewer_comment)
+       VALUES (?, ?, ?, ?, ?, ?, CURDATE(), 'ผ่าน', ?)`,
+      [submitted_id, username, project_id, works_id, round_number, link, reviewer_comment]
     );
+
     res.json({ message: 'บันทึกผลการตรวจสอบเรียบร้อย' });
   } catch (error) {
-    console.error(error);
+    console.error('Insert reviewed_works error:', error);
     res.status(500).json({ error: 'Insert error' });
   }
 });
+
 
 // อัปเดตงานเป็นไม่ผ่าน โดยใช้ submitted_id
 app.put('/api/submitted-works/fail/:submitted_id', async (req, res) => {
@@ -936,6 +939,105 @@ app.get('/api/submitted-works/all', async (req, res) => {
   }
 });
 
+app.get('/api/reviewed-works', async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT 
+        rw.review_id,
+        rw.submitted_id,
+        rw.username,
+        rw.project_id,
+        p.project_name,
+        rw.works_id,
+        w.works_name,
+        rw.round_number,
+        rw.link,
+        rw.review_date,
+        rw.status,
+        rw.reviewer_comment
+      FROM reviewed_works rw
+      JOIN projects p ON rw.project_id = p.project_id
+      JOIN works w ON rw.works_id = w.work_id
+    `);
+
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching reviewed_works:', error);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+// POST /api/exported_works
+app.post('/api/exported_works', async (req, res) => {
+  const { review_id, submitted_id, username, project_id, works_id, round_number, link, reviewer_comment } = req.body;
+
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    // 1. แทรกข้อมูลลงตารางใหม่
+    await conn.query(`
+      INSERT INTO exported_works 
+      (submitted_id, username, project_id, works_id, round_number, link, reviewer_comment)
+      VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [submitted_id, username, project_id, works_id, round_number, link, reviewer_comment]
+    );
+
+    // 2. ลบข้อมูลจาก reviewed_works
+    await conn.query(`DELETE FROM reviewed_works WHERE review_id = ?`, [review_id]);
+
+    await conn.commit();
+    res.json({ message: 'ย้ายงานสำเร็จ' });
+
+  } catch (err) {
+    await conn.rollback();
+    console.error(err);
+    res.status(500).json({ error: 'เกิดข้อผิดพลาดในการย้ายงาน' });
+  } finally {
+    conn.release();
+  }
+});
+
+
+
+app.get('/api/submitted-works/pending-safe', async (req, res) => {
+  try {
+    // ใช้ CAST เพื่อให้ชนิดข้อมูลตรงกันระหว่างตาราง
+    const [rows] = await pool.query(`
+      SELECT sw.*
+      FROM submitted_works sw
+      LEFT JOIN reviewed_works rw 
+        ON CAST(sw.submitted_id AS CHAR) = CAST(rw.submitted_id AS CHAR)
+      WHERE rw.submitted_id IS NULL
+        AND sw.status = 'ผ่าน'
+      ORDER BY sw.submitted_id ASC
+    `);
+
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching pending works safely:', error);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+app.get('/api/exported-works', async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT ew.review_id, ew.submitted_id, ew.username, 
+             ew.project_id, ew.works_id, ew.round_number,
+             ew.link,  -- ดึงลิงก์จาก exported_works โดยตรง
+             ew.review_date, ew.status, ew.reviewer_comment,
+             p.project_name, w.works_name
+      FROM exported_works ew
+      LEFT JOIN projects p ON ew.project_id = p.project_id
+      LEFT JOIN works w ON ew.works_id = w.work_id
+    `);
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching exported works:', error);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
 
 
 
