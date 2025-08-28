@@ -1039,6 +1039,23 @@ app.get('/api/exported-works', async (req, res) => {
   }
 });
 
+// ดึง reviewed_works ทั้งหมด
+app.get('/api/reviewed-works', async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT review_id, submitted_id, username, project_id, works_id, round_number,
+             link, review_date, status, reviewer_comment
+      FROM reviewed_works
+    `);
+
+    console.log('Reviewed works count:', rows.length);
+    res.json(rows);
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
 
 
 // ----- SPA Fallback: ใช้ RegExp แทน "*" -----

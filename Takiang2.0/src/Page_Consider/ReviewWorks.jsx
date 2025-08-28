@@ -11,15 +11,32 @@ function ReviewWorks() {
   }, []);
 
   const fetchWorks = async () => {
-    try {
-      const res = await axios.get('/api/submitted-works/');
-      // กรองเฉพาะงานที่ผ่านชั้นแรก
-      const filtered = res.data.filter(w => w.status === 'ผ่าน');
-      setWorks(filtered);
-    } catch (err) {
-      console.error('Error fetching works:', err);
-    }
-  };
+  try {
+    // ดึง submitted_works ทั้งหมด
+    const res = await axios.get('/api/submitted-works/');
+    const allWorks = res.data;
+
+    // ดึง reviewed_works ทั้งหมด (ต้องมี API สำหรับนี้ด้วย)
+    const reviewedRes = await axios.get('/api/reviewed-works/');
+    const reviewedWorks = reviewedRes.data;
+
+    // กรองเฉพาะงานที่ status = 'ผ่าน' และยังไม่อยู่ใน reviewed_works
+    const unreviewed = allWorks.filter(sw => 
+      sw.status === 'ผ่าน' &&
+      !reviewedWorks.some(rw => 
+        rw.username === sw.username &&
+        rw.project_id === sw.project_id &&
+        rw.works_id === sw.works_id &&
+        rw.round_number === sw.round_number
+      )
+    );
+
+    setWorks(unreviewed);
+  } catch (err) {
+    console.error('Error fetching works:', err);
+  }
+};
+
 
   const handlePass = async (work) => {
     try {

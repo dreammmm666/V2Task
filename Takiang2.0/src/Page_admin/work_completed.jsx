@@ -49,7 +49,7 @@ const fetchWorks = async () => {
             <tbody>
               {works.length === 0 ? (
                 <tr>
-                  <td colSpan="8" style={{ textAlign: 'center' }}>ไม่มีงานที่ตรงตามสถานะ</td>
+                  <td colSpan="8" style={{ textAlign: 'center' }}>ไม่มีงานที่เสร็จสิ้น</td>
                 </tr>
               ) : (
                 works.map(work => (
