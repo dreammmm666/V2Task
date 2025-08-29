@@ -16,11 +16,15 @@ function ReviewWorks() {
     const res = await axios.get('/api/submitted-works/');
     const allWorks = res.data;
 
-    // ดึง reviewed_works ทั้งหมด (ต้องมี API สำหรับนี้ด้วย)
+    // ดึง reviewed_works ทั้งหมด
     const reviewedRes = await axios.get('/api/reviewed-works/');
     const reviewedWorks = reviewedRes.data;
 
-    // กรองเฉพาะงานที่ status = 'ผ่าน' และยังไม่อยู่ใน reviewed_works
+    // ดึง exported_works ทั้งหมด
+    const exportedRes = await axios.get('/api/exported-works/');
+    const exportedWorks = exportedRes.data;
+
+    // กรองงานที่ไม่อยู่ใน reviewed_works และ exported_works
     const unreviewed = allWorks.filter(sw => 
       sw.status === 'ผ่าน' &&
       !reviewedWorks.some(rw => 
@@ -28,6 +32,12 @@ function ReviewWorks() {
         rw.project_id === sw.project_id &&
         rw.works_id === sw.works_id &&
         rw.round_number === sw.round_number
+      ) &&
+      !exportedWorks.some(ew => 
+        ew.username === sw.username &&
+        ew.project_id === sw.project_id &&
+        ew.works_id === sw.works_id &&
+        ew.round_number === sw.round_number
       )
     );
 
@@ -91,11 +101,11 @@ const handleFail = async (work) => {
   }
 };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '-';
-    const d = new Date(dateString);
-    return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
-  };
+  //const formatDate = (dateString) => {
+    //if (!dateString) return '-';
+    //const d = new Date(dateString);
+    //return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  //};
 
   return (
     <>
