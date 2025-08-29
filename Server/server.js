@@ -417,7 +417,7 @@ app.put('/api/submitted-works/update', async (req, res) => {
   try {
     await conn.beginTransaction();
 
-    // อัปเดต submitted_works รอบที่แก้ไข
+    // อัปเดต submitted_works รอบที่แก้ไขเท่านั้น
     await conn.query(
       `UPDATE submitted_works 
        SET status = ?, reviewer_comment = ? 
@@ -425,33 +425,8 @@ app.put('/api/submitted-works/update', async (req, res) => {
       [status, reviewer_comment, username, project_id, works_id, round_number]
     );
 
-    // ดึงสถานะทั้งหมดของ submitted_works รอบนั้นๆ
-    const [rows] = await conn.query(
-      `SELECT status FROM submitted_works WHERE works_id = ?`,
-      [works_id]
-    );
-
-    // เช็คสถานะรวมของทุกรอบ
-    // ถ้ามีรอบไหน 'ไม่ผ่าน' หรือ 'รอดําเนินการ' => works.status = 'กำลังดำเนินการ'
-    // ถ้าผ่านหมด => works.status = 'เสร็จสิ้น'
-    let worksStatus = 'เสร็จสิ้น';
-    for (const row of rows) {
-      if (row.status === 'ไม่ผ่าน' || row.status === 'รอดําเนินการ') {
-        worksStatus = 'กำลังดำเนินการ';
-        break;
-      }
-    }
-
-    // อัปเดต works.status ตามผลรวม
-    await conn.query(
-      `UPDATE works 
-       SET status = ? 
-       WHERE work_id = ? AND project_id = ?`,
-      [worksStatus, works_id, project_id]
-    );
-
     await conn.commit();
-    res.json({ message: 'อัปเดตสถานะ submitted_works และ works เรียบร้อย' });
+    res.json({ message: 'อัปเดตสถานะ submitted_works เรียบร้อย' });
   } catch (error) {
     await conn.rollback();
     console.error(error);
@@ -975,7 +950,7 @@ app.post('/api/exported_works', async (req, res) => {
   try {
     await conn.beginTransaction();
 
-    // 1. แทรกข้อมูลลงตารางใหม่
+    // 1. ย้ายงานไป exported_works
     await conn.query(`
       INSERT INTO exported_works 
       (submitted_id, username, project_id, works_id, round_number, link, reviewer_comment)
@@ -983,11 +958,34 @@ app.post('/api/exported_works', async (req, res) => {
       [submitted_id, username, project_id, works_id, round_number, link, reviewer_comment]
     );
 
-    // 2. ลบข้อมูลจาก reviewed_works
+    // 2. ลบงานออกจาก reviewed_works
     await conn.query(`DELETE FROM reviewed_works WHERE review_id = ?`, [review_id]);
 
+    // 3. ตรวจสอบสถานะของ submitted_works ทั้งหมดของ works_id นี้
+    const [rows] = await conn.query(
+      `SELECT status FROM submitted_works WHERE works_id = ?`,
+      [works_id]
+    );
+
+    // กำหนดสถานะของ works ตามสถานะของ submitted_works
+    let worksStatus = 'เสร็จสิ้น';
+    for (const row of rows) {
+      if (row.status === 'ไม่ผ่าน' || row.status === 'รอดําเนินการ') {
+        worksStatus = 'กำลังดำเนินการ';
+        break;
+      }
+    }
+
+    // 4. อัปเดตสถานะในตาราง works
+    await conn.query(
+      `UPDATE works 
+       SET status = ? 
+       WHERE work_id = ? AND project_id = ?`,
+      [worksStatus, works_id, project_id]
+    );
+
     await conn.commit();
-    res.json({ message: 'ย้ายงานสำเร็จ' });
+    res.json({ message: 'ย้ายงานสำเร็จและอัปเดตสถานะ works แล้ว' });
 
   } catch (err) {
     await conn.rollback();
@@ -997,8 +995,6 @@ app.post('/api/exported_works', async (req, res) => {
     conn.release();
   }
 });
-
-
 
 app.get('/api/submitted-works/pending-safe', async (req, res) => {
   try {
